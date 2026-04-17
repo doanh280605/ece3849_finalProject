@@ -35,6 +35,7 @@ static Button btnPause(S1);
 static Button btnReset(S2);
 // Joystick (axes + stick push). Pins from HAL pins.h (BOOSTERPACK1)
 static Joystick gJoystick(JSX, JSY, JS1);
+static TaskHandle_t xRenderHandle = NULL;
 
 // Config
 #define INPUT_TICK_MS   10U
@@ -77,7 +78,7 @@ int main(void)
     // Create tasks (priorities per lab suggestion)
     xTaskCreate(vInputTask,  "Input",  512, NULL, 2, NULL);
     xTaskCreate(vSnakeTask,  "Snake",  512, NULL, 2, NULL);
-    xTaskCreate(vRenderTask, "Render", 768, NULL, 1, NULL);
+    xTaskCreate(vRenderTask, "Render", 768, NULL, 1, &xRenderHandle);
 
     vTaskStartScheduler();
     while (1);
@@ -96,6 +97,7 @@ static void vInputTask(void *pvParameters)
 {
     (void)pvParameters;
     Direction requestedDirection;
+    bool shouldNotifyRender;
 
     for (;;) {
         // Hardware button + joystick polling
@@ -103,19 +105,23 @@ static void vInputTask(void *pvParameters)
         btnReset.tick();
         gJoystick.tick();
 
+        shouldNotifyRender = false;
         xSemaphoreTake(gGameStateMutex, portMAX_DELAY); // Lock game state for update shared game data
 
         // S1 only toggles between Playing and Paused
         if (btnPause.wasPressed()) {
             if (gameState.mode == PLAYING) {
                 gameState.mode = PAUSED;
+                shouldNotifyRender = true;
             } else if (gameState.mode == PAUSED) {
                 gameState.mode = PLAYING;
+                shouldNotifyRender = true;
             }
         }
         // Pressing S2 restarts the game through ResetGame().
         if (btnReset.wasPressed()) {
             gameState.needsReset = true;
+            shouldNotifyRender = true;
         }
 
         // Joystick 8-way direction mapping to game directions
@@ -151,6 +157,9 @@ static void vInputTask(void *pvParameters)
         }
 
         xSemaphoreGive(gGameStateMutex);
+        if (shouldNotifyRender && xRenderHandle != NULL) {
+            xTaskNotifyGive(xRenderHandle);
+        }
         vTaskDelay(pdMS_TO_TICKS(INPUT_TICK_MS));
     }
 }
@@ -164,6 +173,9 @@ static void vSnakeTask(void *pvParameters)
     ResetGame();
     SpawnFood();
     xSemaphoreGive(gGameStateMutex);
+    if (xRenderHandle != NULL) {
+        xTaskNotifyGive(xRenderHandle);
+    }
 
     for(;;){
         uint32_t currentTickMs;
@@ -180,6 +192,9 @@ static void vSnakeTask(void *pvParameters)
         // reads the current shared tick period under the mutex
         currentTickMs = gSnakeTickMs;
         xSemaphoreGive(gGameStateMutex);
+        if (xRenderHandle != NULL) {
+            xTaskNotifyGive(xRenderHandle);
+        }
         // now uses that dynamic period to control snake update task
         vTaskDelay(pdMS_TO_TICKS(currentTickMs));
     }
@@ -196,9 +211,9 @@ static void vRenderTask(void *pvParameters)
     GameMode localMode;
 
     LCD_Init();
-    TickType_t last = xTaskGetTickCount();
     for(;;)
     {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         xSemaphoreTake(gGameStateMutex, portMAX_DELAY); // Takes mutex before reading snakeLength and snake
         localSnakeLength = snakeLength;
         for (uint8_t i = 0; i < localSnakeLength; ++i) {
@@ -210,6 +225,5 @@ static void vRenderTask(void *pvParameters)
         xSemaphoreGive(gGameStateMutex);
 
         DrawGame(localSnake, localSnakeLength, localFood, localScore, localMode);
-        vTaskDelayUntil(&last, pdMS_TO_TICKS(33));
     }
 }
