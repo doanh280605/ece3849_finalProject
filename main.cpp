@@ -258,10 +258,10 @@ static void vBuzzerTask(void *pvParameters)
             portMAX_DELAY);
 
         if (bits & EVT_FOOD_EATEN) {
-            Buzzer_Play(1800U, 90U);
+            Buzzer_Play(400U, 140U);
         }
         if (bits & EVT_GAME_OVER) {
-            Buzzer_Play(350U, 500U);
+            Buzzer_Play(3000U, 260U);
         }
     }
 }
