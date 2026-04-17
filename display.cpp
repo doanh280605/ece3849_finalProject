@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 
 extern "C" {
 #include "Crystalfontz128x128_ST7735.h"
@@ -34,18 +35,24 @@ static inline void drawCell(uint8_t gx, uint8_t gy, uint32_t color)
 }
 
 
-void DrawGame(const SnakeGameState* state)
+void DrawGame(const Position *snakeData, uint8_t length, Position food, uint16_t score)
 {
-    (void)state; // not used for minimal version yet
+    char scoreText[20];
 
     // Clear background
     tRectangle full = {0, 0, 127, 127};
     GrContextForegroundSet(&gContext, ClrBlack);
     GrRectFill(&gContext, &full);
 
+    snprintf(scoreText, sizeof(scoreText), "Score: %u", score);
+    GrContextForegroundSet(&gContext, ClrWhite);
+    GrStringDraw(&gContext, scoreText, -1, 2, 2, false);
+
+    drawCell(food.x, food.y, ClrRed);
+
     // Draw snake
-    for (uint8_t i = 0; i < snakeLength; ++i) {
-        drawCell(snake[i].x, snake[i].y, i == 0 ? ClrGreen : ClrYellow);
+    for (uint8_t i = 0; i < length; ++i) {
+        drawCell(snakeData[i].x, snakeData[i].y, i == 0 ? ClrGreen : ClrYellow);
     }
 
 #ifdef GrFlush

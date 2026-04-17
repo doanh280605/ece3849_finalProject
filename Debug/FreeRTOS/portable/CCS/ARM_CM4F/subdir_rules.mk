@@ -1,0 +1,20 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+# Each subdirectory must supply rules for building sources it contributes
+FreeRTOS/portable/CCS/ARM_CM4F/port.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F/port.c $(GEN_OPTS) | $(GEN_FILES) $(GEN_MISC_FILES)
+	@echo 'Building file: "$<"'
+	@echo 'Invoking: Arm Compiler'
+	"/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran" --include_path="/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/display" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/elapsedTime" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/joystickDriver" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/pll" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/timerLib" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/HAL_TM4C1294" --include_path="/Users/Doanh/ti/TivaWare_C_Series-2.2.0.295" --include_path="/Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib" --include_path="/Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/utils" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F" --include_path="PROJECT_LOC" --define=ccs="ccs" --define=PART_TM4C1294NCPDT -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="FreeRTOS/portable/CCS/ARM_CM4F/$(basename $(<F)).d_raw" --obj_directory="FreeRTOS/portable/CCS/ARM_CM4F" $(GEN_OPTS__FLAG) "$<"
+	@echo 'Finished building: "$<"'
+	@echo ' '
+
+FreeRTOS/portable/CCS/ARM_CM4F/portasm.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F/portasm.asm $(GEN_OPTS) | $(GEN_FILES) $(GEN_MISC_FILES)
+	@echo 'Building file: "$<"'
+	@echo 'Invoking: Arm Compiler'
+	"/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran" --include_path="/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/display" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/elapsedTime" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/joystickDriver" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/pll" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/timerLib" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/libraries/HAL_TM4C1294" --include_path="/Users/Doanh/ti/TivaWare_C_Series-2.2.0.295" --include_path="/Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib" --include_path="/Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/utils" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include" --include_path="/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F" --include_path="PROJECT_LOC" --define=ccs="ccs" --define=PART_TM4C1294NCPDT -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="FreeRTOS/portable/CCS/ARM_CM4F/$(basename $(<F)).d_raw" --obj_directory="FreeRTOS/portable/CCS/ARM_CM4F" $(GEN_OPTS__FLAG) "$<"
+	@echo 'Finished building: "$<"'
+	@echo ' '
+
+

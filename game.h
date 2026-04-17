@@ -26,7 +26,15 @@ typedef struct { uint8_t x, y; } Position;
 // Snake representation
 extern Position snake[MAX_LEN];
 extern uint8_t snakeLength;
+extern Position gFood;
+extern uint16_t gScore;
+extern uint32_t gSnakeTickMs;
+
+#define SNAKE_TICK_START_MS 150U
+#define SNAKE_TICK_MIN_MS   60U
+#define SNAKE_TICK_STEP_MS  5U
 
 // Basic API
 void ResetGame(void);
+void SpawnFood(void);
 void moveSnake(void);

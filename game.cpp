@@ -1,10 +1,15 @@
 #include "game.h"
 
+#include <stdlib.h>
+
 // Global state definitions
 SnakeGameState gameState = { RIGHT, true, false };
 
 Position snake[MAX_LEN];
 uint8_t snakeLength = 4; // Start with a snake length of 4
+Position gFood;
+uint16_t gScore = 0;
+uint32_t gSnakeTickMs = SNAKE_TICK_START_MS;
 
 // If the coordinate goes below 0, move it to GRID_SIZE - 1.
 // If the coordinate reaches GRID_SIZE, move it back to 0.
@@ -26,8 +31,28 @@ void ResetGame(void)
     gameState.currentDirection = RIGHT;
     gameState.isRunning = true;
     gameState.needsReset = false;
+    gScore = 0;
+    gSnakeTickMs = SNAKE_TICK_START_MS;
 }
 
+// loops until it finds a random cell that does not overlap the current snake 
+void SpawnFood(void)
+{
+    bool overlapsSnake;
+
+    do {
+        overlapsSnake = false;
+        gFood.x = (uint8_t)(rand() % GRID_SIZE);
+        gFood.y = (uint8_t)(rand() % GRID_SIZE);
+
+        for (uint8_t i = 0; i < snakeLength; ++i) {
+            if (snake[i].x == gFood.x && snake[i].y == gFood.y) {
+                overlapsSnake = true;
+                break;
+            }
+        }
+    } while (overlapsSnake);
+}
 
 void moveSnake()
 {
@@ -68,5 +93,31 @@ void moveSnake()
                 snake[0].x = (uint8_t)(snake[0].x + 1);
             }
             break;
+    }
+
+    // the food check happens after movement, because you only know whether the head reached food after the head is 
+    // in its new position
+    if (snake[0].x == gFood.x && snake[0].y == gFood.y) {
+        if (snakeLength < MAX_LEN) {
+            ++snakeLength;
+        }
+        ++gScore;
+        if (gSnakeTickMs > SNAKE_TICK_MIN_MS) {
+            // the period is clamped so it never goes below 60ms
+            if ((gSnakeTickMs - SNAKE_TICK_STEP_MS) < SNAKE_TICK_MIN_MS) {
+                gSnakeTickMs = SNAKE_TICK_MIN_MS;
+            } else {
+                gSnakeTickMs -= SNAKE_TICK_STEP_MS;
+            }
+        }
+        SpawnFood();
+    }
+
+    for (uint8_t i = 1; i < snakeLength; ++i) {
+        if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) {
+            gameState.isRunning = false;
+            gameState.needsReset = true;
+            break;
+        }
     }
 }

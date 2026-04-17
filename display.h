@@ -1,10 +1,9 @@
 #pragma once
 
-// Forward declaration for game state (defined in game.h).
-struct SnakeGameState;
+#include "game.h"
 
 // Initialize LCD controller and the grlib drawing context.
 void LCD_Init(void);
 
-// Draw the full game frame: for now just background and snake.
-void DrawGame(const SnakeGameState* state);
+// Draw the current game snapshot without touching shared state.
+void DrawGame(const Position *snakeData, uint8_t length, Position food, uint16_t score);

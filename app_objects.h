@@ -5,6 +5,7 @@
 
 extern "C" {
 #include "FreeRTOS.h"
+#include "semphr.h"
 #include "grlib/grlib.h"
 }
 
@@ -16,4 +17,5 @@ extern tContext gContext;
 // System clock frequency (Hz) set during startup
 extern uint32_t gSysClk;
 
-// Add your synchronization primitives here as you build the lab
+// Protects the shared game state accessed by multiple tasks.
+extern SemaphoreHandle_t gGameStateMutex;

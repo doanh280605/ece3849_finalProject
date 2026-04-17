@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 extern "C" {
 #include "driverlib/fpu.h"
@@ -27,6 +28,7 @@ extern "C" {
 // Shared objects
 tContext gContext;
 uint32_t gSysClk;
+SemaphoreHandle_t gGameStateMutex;
 
 // Buttons used for pause/reset
 static Button btnPause(S1);
@@ -64,6 +66,12 @@ int main(void)
     // Optional joystick tuning
     gJoystick.setDeadzone(0.15f);
 
+    gGameStateMutex = xSemaphoreCreateMutex();
+    if (gGameStateMutex == NULL) {
+        while (1) {
+        }
+    }
+
     IntMasterEnable();
 
     // Create tasks (priorities per lab suggestion)
@@ -87,11 +95,15 @@ static void configureSystemClock(void)
 static void vInputTask(void *pvParameters)
 {
     (void)pvParameters;
+    Direction requestedDirection;
+
     for (;;) {
         // Hardware button + joystick polling
         btnPause.tick();
         btnReset.tick();
         gJoystick.tick();
+
+        xSemaphoreTake(gGameStateMutex, portMAX_DELAY); // Lock game state for update shared game data
 
         // Toggle pause on S1
         if (btnPause.wasPressed()) {
@@ -103,22 +115,23 @@ static void vInputTask(void *pvParameters)
         }
 
         // Joystick 8-way direction mapping to game directions
+        requestedDirection = gameState.currentDirection;
         switch (gJoystick.direction8()) {
             case JoystickDir::N:
             case JoystickDir::NE:
             case JoystickDir::NW:
-                gameState.currentDirection = UP;
+                requestedDirection = UP;
                 break;
             case JoystickDir::S:
             case JoystickDir::SE:
             case JoystickDir::SW:
-                gameState.currentDirection = DOWN;
+                requestedDirection = DOWN;
                 break;
             case JoystickDir::E:
-                gameState.currentDirection = RIGHT;
+                requestedDirection = RIGHT;
                 break;
             case JoystickDir::W:
-                gameState.currentDirection = LEFT;
+                requestedDirection = LEFT;
                 break;
             case JoystickDir::Center:
             default:
@@ -126,6 +139,14 @@ static void vInputTask(void *pvParameters)
                 break;
         }
 
+        if (!((gameState.currentDirection == UP && requestedDirection == DOWN) ||
+              (gameState.currentDirection == DOWN && requestedDirection == UP) ||
+              (gameState.currentDirection == LEFT && requestedDirection == RIGHT) ||
+              (gameState.currentDirection == RIGHT && requestedDirection == LEFT))) {
+            gameState.currentDirection = requestedDirection;
+        }
+
+        xSemaphoreGive(gGameStateMutex);
         vTaskDelay(pdMS_TO_TICKS(INPUT_TICK_MS));
     }
 }
@@ -134,15 +155,29 @@ static void vInputTask(void *pvParameters)
 static void vSnakeTask(void *pvParameters)
 {
     (void)pvParameters;
+    xSemaphoreTake(gGameStateMutex, portMAX_DELAY);
+    srand((unsigned int)xTaskGetTickCount());
     ResetGame();
+    SpawnFood();
+    xSemaphoreGive(gGameStateMutex);
+
     for(;;){
+        uint32_t currentTickMs;
+
+        xSemaphoreTake(gGameStateMutex, portMAX_DELAY);
+        // take mutex before checking/updatinig shared state through gameState, snake and snakelength
         if (gameState.needsReset) {
             ResetGame();
+            SpawnFood();
         }
         if (gameState.isRunning) {
             moveSnake();
         }
-        vTaskDelay(pdMS_TO_TICKS(150));
+        // reads the current shared tick period under the mutex
+        currentTickMs = gSnakeTickMs;
+        xSemaphoreGive(gGameStateMutex);
+        // now uses that dynamic period
+        vTaskDelay(pdMS_TO_TICKS(currentTickMs));
     }
 }
 
@@ -150,11 +185,25 @@ static void vSnakeTask(void *pvParameters)
 static void vRenderTask(void *pvParameters)
 {
     (void)pvParameters;
+    Position localSnake[MAX_LEN];
+    uint8_t localSnakeLength = 0;
+    Position localFood;
+    uint16_t localScore;
+
     LCD_Init();
     TickType_t last = xTaskGetTickCount();
     for(;;)
     {
-        DrawGame(&gameState);
+        xSemaphoreTake(gGameStateMutex, portMAX_DELAY); // Takes mutex before reading snakeLength and snake
+        localSnakeLength = snakeLength;
+        for (uint8_t i = 0; i < localSnakeLength; ++i) {
+            localSnake[i] = snake[i];
+        }
+        localFood = gFood;  // render cannot read gfood while snake task is updating
+        localScore = gScore;
+        xSemaphoreGive(gGameStateMutex);
+
+        DrawGame(localSnake, localSnakeLength, localFood, localScore);
         vTaskDelayUntil(&last, pdMS_TO_TICKS(33));
     }
 }

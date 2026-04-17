@@ -11,3 +11,8 @@ No, volatile is not enought to make this safe. volatile only tells the compiler 
 3. 
 If vRenderTask runs every 33ms, then in 1 second it redraws about: 1000 / 33 = 30.3
 When the game is paused, it causes about 30 unnecessary redraws per second, since nothing on screen is changing but the render task still keep drawing. 
+
+Part 1: I would use one mutex for the shared game state rather than separate mutexes for each variable. The snake position, snake length, direction, food and score are logically related and are read together by the render task. One mutex keeps the design simpler and ensures the renderer sees a consistent game state. The critical section should be kept short by copying the shared state into local variables and release the mutex before performing the LCD draw. 
+
+Part 2: 
+Keep wrap around and not implement wall collision
