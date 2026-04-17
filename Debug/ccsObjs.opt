@@ -1,6 +1,7 @@
 "./Crystalfontz128x128_ST7735.obj"
 "./HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj"
 "./button.obj"
+"./buzzer.obj"
 "./display.obj"
 "./game.obj"
 "./joystick.obj"

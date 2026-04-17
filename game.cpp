@@ -1,4 +1,5 @@
 #include "game.h"
+#include "app_objects.h"
 
 #include <stdlib.h>
 
@@ -110,12 +111,14 @@ void moveSnake()
                 gSnakeTickMs -= SNAKE_TICK_STEP_MS;
             }
         }
+        xEventGroupSetBits(xGameEvents, EVT_FOOD_EATEN); // announces that food was eaten
         SpawnFood();
     }
 
     for (uint8_t i = 1; i < snakeLength; ++i) {
         if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) {
             gameState.mode = GAME_OVER;
+            xEventGroupSetBits(xGameEvents, EVT_GAME_OVER);
             break;
         }
     }

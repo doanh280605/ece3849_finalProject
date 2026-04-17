@@ -33,10 +33,12 @@ display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/portable.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/deprecated_definitions.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F/portmacro.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/mpu_wrappers.h
-display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/semphr.h
-display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/queue.h
+display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/event_groups.h
+display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/timers.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/task.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/list.h
+display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/semphr.h
+display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/queue.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/game.h
 
 /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/display.cpp:
@@ -105,13 +107,17 @@ display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/gam
 
 /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/mpu_wrappers.h:
 
-/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/semphr.h:
+/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/event_groups.h:
 
-/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/queue.h:
+/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/timers.h:
 
 /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/task.h:
 
 /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/list.h:
+
+/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/semphr.h:
+
+/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/queue.h:
 
 /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/game.h:
 

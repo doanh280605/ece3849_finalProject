@@ -11,6 +11,7 @@ ORDERED_OBJS += \
 "./Crystalfontz128x128_ST7735.obj" \
 "./HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj" \
 "./button.obj" \
+"./buzzer.obj" \
 "./display.obj" \
 "./game.obj" \
 "./joystick.obj" \
@@ -165,9 +166,9 @@ ece3849_lab3_lphung_shtran.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "Crystalfontz128x128_ST7735.obj" "HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj" "button.obj" "display.obj" "game.obj" "joystick.obj" "main.obj" "startup_ccs.obj" "timerLib.obj" "FreeRTOS/croutine.obj" "FreeRTOS/event_groups.obj" "FreeRTOS/list.obj" "FreeRTOS/queue.obj" "FreeRTOS/stream_buffer.obj" "FreeRTOS/tasks.obj" "FreeRTOS/timers.obj" "FreeRTOS/portable/CCS/ARM_CM4F/port.obj" "FreeRTOS/portable/CCS/ARM_CM4F/portasm.obj" "FreeRTOS/portable/MemMang/heap_4.obj" 
+	-$(RM) "Crystalfontz128x128_ST7735.obj" "HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj" "button.obj" "buzzer.obj" "display.obj" "game.obj" "joystick.obj" "main.obj" "startup_ccs.obj" "timerLib.obj" "FreeRTOS/croutine.obj" "FreeRTOS/event_groups.obj" "FreeRTOS/list.obj" "FreeRTOS/queue.obj" "FreeRTOS/stream_buffer.obj" "FreeRTOS/tasks.obj" "FreeRTOS/timers.obj" "FreeRTOS/portable/CCS/ARM_CM4F/port.obj" "FreeRTOS/portable/CCS/ARM_CM4F/portasm.obj" "FreeRTOS/portable/MemMang/heap_4.obj" 
 	-$(RM) "Crystalfontz128x128_ST7735.d" "HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.d" "startup_ccs.d" "FreeRTOS/croutine.d" "FreeRTOS/event_groups.d" "FreeRTOS/list.d" "FreeRTOS/queue.d" "FreeRTOS/stream_buffer.d" "FreeRTOS/tasks.d" "FreeRTOS/timers.d" "FreeRTOS/portable/CCS/ARM_CM4F/port.d" "FreeRTOS/portable/MemMang/heap_4.d" 
-	-$(RM) "button.d" "display.d" "game.d" "joystick.d" "main.d" "timerLib.d" 
+	-$(RM) "button.d" "buzzer.d" "display.d" "game.d" "joystick.d" "main.d" "timerLib.d" 
 	-$(RM) "FreeRTOS/portable/CCS/ARM_CM4F/portasm.d" 
 	-@echo 'Finished clean'
 	-@echo ' '

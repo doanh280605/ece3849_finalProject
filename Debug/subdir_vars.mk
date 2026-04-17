@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 /Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver/button.cpp \
+../buzzer.cpp \
 ../display.cpp \
 ../game.cpp \
 ../joystick.cpp \
@@ -28,6 +29,7 @@ OBJS += \
 ./Crystalfontz128x128_ST7735.obj \
 ./HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj \
 ./button.obj \
+./buzzer.obj \
 ./display.obj \
 ./game.obj \
 ./joystick.obj \
@@ -37,6 +39,7 @@ OBJS += \
 
 CPP_DEPS += \
 ./button.d \
+./buzzer.d \
 ./display.d \
 ./game.d \
 ./joystick.d \
@@ -47,6 +50,7 @@ OBJS__QUOTED += \
 "Crystalfontz128x128_ST7735.obj" \
 "HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj" \
 "button.obj" \
+"buzzer.obj" \
 "display.obj" \
 "game.obj" \
 "joystick.obj" \
@@ -61,6 +65,7 @@ C_DEPS__QUOTED += \
 
 CPP_DEPS__QUOTED += \
 "button.d" \
+"buzzer.d" \
 "display.d" \
 "game.d" \
 "joystick.d" \
@@ -74,6 +79,7 @@ C_SRCS__QUOTED += \
 
 CPP_SRCS__QUOTED += \
 "/Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver/button.cpp" \
+"../buzzer.cpp" \
 "../display.cpp" \
 "../game.cpp" \
 "../joystick.cpp" \

@@ -33,6 +33,8 @@ main.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/portable.h
 main.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/deprecated_definitions.h
 main.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F/portmacro.h
 main.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/mpu_wrappers.h
+main.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/event_groups.h
+main.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/timers.h
 main.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/task.h
 main.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/list.h
 main.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/semphr.h
@@ -42,6 +44,7 @@ main.obj: /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib/gpio.h
 main.obj: /Users/Doanh/Documents/ECE_3849/lab1/libraries/HAL_TM4C1294/pins.h
 main.obj: /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h
 main.obj: /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib/adc.h
+main.obj: ../buzzer.h
 main.obj: ../joystick.h
 main.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/math.h
 main.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/math.h
@@ -125,6 +128,10 @@ main.obj: ../display.h
 
 /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/mpu_wrappers.h:
 
+/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/event_groups.h:
+
+/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/timers.h:
+
 /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/task.h:
 
 /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/list.h:
@@ -142,6 +149,8 @@ main.obj: ../display.h
 /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h:
 
 /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib/adc.h:
+
+../buzzer.h:
 
 ../joystick.h:
 

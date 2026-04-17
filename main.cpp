@@ -12,12 +12,14 @@ extern "C" {
 #include "sysctl_pll.h"
 
 #include "FreeRTOS.h"
+#include "event_groups.h"
 #include "task.h"
 #include "semphr.h"
 }
 
 // Board drivers (provided in project includes)
 #include "button.h"
+#include "buzzer.h"
 #include "joystick.h"
 
 // App modules per lab structure
@@ -29,13 +31,15 @@ extern "C" {
 tContext gContext;
 uint32_t gSysClk;
 SemaphoreHandle_t gGameStateMutex;
+EventGroupHandle_t xGameEvents;
 
 // Buttons used for pause/reset
 static Button btnPause(S1);
 static Button btnReset(S2);
 // Joystick (axes + stick push). Pins from HAL pins.h (BOOSTERPACK1)
 static Joystick gJoystick(JSX, JSY, JS1);
-static TaskHandle_t xRenderHandle = NULL;
+static TaskHandle_t xRenderHandle = NULL; // store the handle of the render task
+// other tasks need this handle so they know which task to notify 
 
 // Config
 #define INPUT_TICK_MS   10U
@@ -45,6 +49,7 @@ static void configureSystemClock(void);
 static void vInputTask(void *pvParameters);
 static void vSnakeTask(void *pvParameters);
 static void vRenderTask(void *pvParameters);
+static void vBuzzerTask(void *pvParameters);
 
 int main(void)
 {
@@ -59,6 +64,7 @@ int main(void)
     btnPause.begin();
     btnReset.begin();
     gJoystick.begin();
+    Buzzer_Init(gSysClk);
     btnPause.setTickIntervalMs(INPUT_TICK_MS);
     btnReset.setTickIntervalMs(INPUT_TICK_MS);
     gJoystick.setTickIntervalMs(INPUT_TICK_MS);
@@ -73,12 +79,21 @@ int main(void)
         }
     }
 
+    // create event group before the scheduler starts. 
+    xGameEvents = xEventGroupCreate();
+    if (xGameEvents == NULL) {
+        while (1) {
+        }
+    }
+
     IntMasterEnable();
 
-    // Create tasks (priorities per lab suggestion)
+    // Create tasks with suggested priorities
     xTaskCreate(vInputTask,  "Input",  512, NULL, 2, NULL);
     xTaskCreate(vSnakeTask,  "Snake",  512, NULL, 2, NULL);
     xTaskCreate(vRenderTask, "Render", 768, NULL, 1, &xRenderHandle);
+    xTaskCreate(vBuzzerTask, "Buzzer", 512, NULL, 1, NULL); // call the buzzer task 
+    // buzzer task will sleep waiting for event bits
 
     vTaskStartScheduler();
     while (1);
@@ -97,7 +112,8 @@ static void vInputTask(void *pvParameters)
 {
     (void)pvParameters;
     Direction requestedDirection;
-    bool shouldNotifyRender;
+    bool shouldNotifyRender; // tracks whether input changed something visible on screen. 
+    // render will get a notify after the mutex is released. 
 
     for (;;) {
         // Hardware button + joystick polling
@@ -105,7 +121,7 @@ static void vInputTask(void *pvParameters)
         btnReset.tick();
         gJoystick.tick();
 
-        shouldNotifyRender = false;
+        shouldNotifyRender = false; // reset the flag at the start of each input loop
         xSemaphoreTake(gGameStateMutex, portMAX_DELAY); // Lock game state for update shared game data
 
         // S1 only toggles between Playing and Paused
@@ -225,5 +241,27 @@ static void vRenderTask(void *pvParameters)
         xSemaphoreGive(gGameStateMutex);
 
         DrawGame(localSnake, localSnakeLength, localFood, localScore, localMode);
+    }
+}
+
+static void vBuzzerTask(void *pvParameters)
+{
+    (void)pvParameters;
+
+    for (;;) {
+        // makes buzzer task sleep until one of the event bits is set
+        EventBits_t bits = xEventGroupWaitBits(
+            xGameEvents,
+            EVT_FOOD_EATEN | EVT_GAME_OVER, // wait for either event to happen
+            pdTRUE, // clear the matched bits after waking up, so that the task will wait for the next event(s) after this
+            pdFALSE, // wake on any one bit, not all 
+            portMAX_DELAY);
+
+        if (bits & EVT_FOOD_EATEN) {
+            Buzzer_Play(1800U, 90U);
+        }
+        if (bits & EVT_GAME_OVER) {
+            Buzzer_Play(350U, 500U);
+        }
     }
 }
