@@ -35,14 +35,40 @@ static inline void drawCell(uint8_t gx, uint8_t gy, uint32_t color)
 }
 
 
-void DrawGame(const Position *snakeData, uint8_t length, Position food, uint16_t score)
+void DrawGame(const Position *snakeData, uint8_t length, Position food, uint16_t score, GameMode mode)
 {
     char scoreText[20];
+    char finalScoreText[24];
+    char pausedScoreText[24];
 
     // Clear background
     tRectangle full = {0, 0, 127, 127};
-    GrContextForegroundSet(&gContext, ClrBlack);
+    GrContextForegroundSet(&gContext, (mode == GAME_OVER || mode == PAUSED) ? ClrBlue : ClrBlack);
     GrRectFill(&gContext, &full);
+
+    if (mode == GAME_OVER) {
+        snprintf(finalScoreText, sizeof(finalScoreText), "Final Score: %u", score);
+        GrContextForegroundSet(&gContext, ClrYellow);
+        GrStringDraw(&gContext, (char *)"GAME OVER", -1, 40, 42, false);
+        GrStringDraw(&gContext, finalScoreText, -1, 25, 58, false);
+        GrStringDraw(&gContext, (char *)"Press S2 to play again", -1, 0, 74, false);
+#ifdef GrFlush
+        GrFlush(&gContext);
+#endif
+        return;
+    }
+
+    if (mode == PAUSED) {
+        snprintf(pausedScoreText, sizeof(pausedScoreText), "Score: %u", score);
+        GrContextForegroundSet(&gContext, ClrYellow);
+        GrStringDraw(&gContext, (char *)"PAUSED", -1, 45, 42, false);
+        GrStringDraw(&gContext, pausedScoreText, -1, 40, 58, false);
+        GrStringDraw(&gContext, (char *)"Press S1 to continue", -1, 5, 74, false);
+#ifdef GrFlush
+        GrFlush(&gContext);
+#endif
+        return;
+    }
 
     snprintf(scoreText, sizeof(scoreText), "Score: %u", score);
     GrContextForegroundSet(&gContext, ClrWhite);

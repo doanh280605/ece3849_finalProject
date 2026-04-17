@@ -6,10 +6,12 @@
 // Direction for snake movement
 typedef enum { UP, DOWN, LEFT, RIGHT } Direction;
 
+typedef enum { PLAYING, PAUSED, GAME_OVER } GameMode;
+
 // High-level game state flags
 typedef struct SnakeGameState {
     Direction currentDirection;
-    bool isRunning;
+    GameMode mode;
     bool needsReset;
 } SnakeGameState;
 

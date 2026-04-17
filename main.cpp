@@ -105,11 +105,15 @@ static void vInputTask(void *pvParameters)
 
         xSemaphoreTake(gGameStateMutex, portMAX_DELAY); // Lock game state for update shared game data
 
-        // Toggle pause on S1
+        // S1 only toggles between Playing and Paused
         if (btnPause.wasPressed()) {
-            gameState.isRunning = !gameState.isRunning;
+            if (gameState.mode == PLAYING) {
+                gameState.mode = PAUSED;
+            } else if (gameState.mode == PAUSED) {
+                gameState.mode = PLAYING;
+            }
         }
-        // Request reset on S2
+        // Pressing S2 restarts the game through ResetGame().
         if (btnReset.wasPressed()) {
             gameState.needsReset = true;
         }
@@ -118,19 +122,19 @@ static void vInputTask(void *pvParameters)
         requestedDirection = gameState.currentDirection;
         switch (gJoystick.direction8()) {
             case JoystickDir::N:
-            case JoystickDir::NE:
-            case JoystickDir::NW:
                 requestedDirection = UP;
                 break;
             case JoystickDir::S:
-            case JoystickDir::SE:
-            case JoystickDir::SW:
                 requestedDirection = DOWN;
                 break;
+            case JoystickDir::NE:
             case JoystickDir::E:
+            case JoystickDir::SE:
                 requestedDirection = RIGHT;
                 break;
+            case JoystickDir::NW:
             case JoystickDir::W:
+            case JoystickDir::SW:
                 requestedDirection = LEFT;
                 break;
             case JoystickDir::Center:
@@ -170,13 +174,13 @@ static void vSnakeTask(void *pvParameters)
             ResetGame();
             SpawnFood();
         }
-        if (gameState.isRunning) {
+        if (gameState.mode == PLAYING) {
             moveSnake();
         }
         // reads the current shared tick period under the mutex
         currentTickMs = gSnakeTickMs;
         xSemaphoreGive(gGameStateMutex);
-        // now uses that dynamic period
+        // now uses that dynamic period to control snake update task
         vTaskDelay(pdMS_TO_TICKS(currentTickMs));
     }
 }
@@ -189,6 +193,7 @@ static void vRenderTask(void *pvParameters)
     uint8_t localSnakeLength = 0;
     Position localFood;
     uint16_t localScore;
+    GameMode localMode;
 
     LCD_Init();
     TickType_t last = xTaskGetTickCount();
@@ -201,9 +206,10 @@ static void vRenderTask(void *pvParameters)
         }
         localFood = gFood;  // render cannot read gfood while snake task is updating
         localScore = gScore;
+        localMode = gameState.mode;
         xSemaphoreGive(gGameStateMutex);
 
-        DrawGame(localSnake, localSnakeLength, localFood, localScore);
+        DrawGame(localSnake, localSnakeLength, localFood, localScore, localMode);
         vTaskDelayUntil(&last, pdMS_TO_TICKS(33));
     }
 }

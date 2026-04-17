@@ -6,4 +6,4 @@
 void LCD_Init(void);
 
 // Draw the current game snapshot without touching shared state.
-void DrawGame(const Position *snakeData, uint8_t length, Position food, uint16_t score);
+void DrawGame(const Position *snakeData, uint8_t length, Position food, uint16_t score, GameMode mode);

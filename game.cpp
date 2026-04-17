@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 // Global state definitions
-SnakeGameState gameState = { RIGHT, true, false };
+SnakeGameState gameState = { RIGHT, PLAYING, false };
 
 Position snake[MAX_LEN];
 uint8_t snakeLength = 4; // Start with a snake length of 4
@@ -29,7 +29,7 @@ void ResetGame(void)
         snake[i].y = cy;
     }
     gameState.currentDirection = RIGHT;
-    gameState.isRunning = true;
+    gameState.mode = PLAYING;
     gameState.needsReset = false;
     gScore = 0;
     gSnakeTickMs = SNAKE_TICK_START_MS;
@@ -115,8 +115,7 @@ void moveSnake()
 
     for (uint8_t i = 1; i < snakeLength; ++i) {
         if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) {
-            gameState.isRunning = false;
-            gameState.needsReset = true;
+            gameState.mode = GAME_OVER;
             break;
         }
     }
