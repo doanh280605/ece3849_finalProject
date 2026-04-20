@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ece3849_lab3_lphung_shtran</name>
+	<name>ece3849_finalProject_lphung_shtran</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -26,9 +26,84 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>app_objects.h</name>
+			<name>app_config.h</name>
 			<type>1</type>
-			<locationURI>PARENT-0-PROJECT_LOC/app_objects.h</locationURI>
+			<locationURI>PARENT-0-PROJECT_LOC/app_config.h</locationURI>
+		</link>
+		<link>
+			<name>app_types.h</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/app_types.h</locationURI>
+		</link>
+		<link>
+			<name>controller_logic.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/controller_logic.cpp</locationURI>
+		</link>
+		<link>
+			<name>controller_logic.h</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/controller_logic.h</locationURI>
+		</link>
+		<link>
+			<name>debug_uart.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/debug_uart.cpp</locationURI>
+		</link>
+		<link>
+			<name>debug_uart.h</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/debug_uart.h</locationURI>
+		</link>
+		<link>
+			<name>motor.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/motor.cpp</locationURI>
+		</link>
+		<link>
+			<name>motor.h</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/motor.h</locationURI>
+		</link>
+		<link>
+			<name>sensor.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/sensor.cpp</locationURI>
+		</link>
+		<link>
+			<name>sensor.h</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/sensor.h</locationURI>
+		</link>
+		<link>
+			<name>safety.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/safety.cpp</locationURI>
+		</link>
+		<link>
+			<name>safety.h</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/safety.h</locationURI>
+		</link>
+		<link>
+			<name>system_tasks.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/system_tasks.cpp</locationURI>
+		</link>
+		<link>
+			<name>system_tasks.h</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/system_tasks.h</locationURI>
+		</link>
+		<link>
+			<name>wireless.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/wireless.cpp</locationURI>
+		</link>
+		<link>
+			<name>wireless.h</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/wireless.h</locationURI>
 		</link>
 		<link>
 			<name>Crystalfontz128x128_ST7735.c</name>
@@ -49,26 +124,6 @@
 			<name>button.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/libraries/buttonsDriver/button.cpp</locationURI>
-		</link>
-		<link>
-			<name>display.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-0-PROJECT_LOC/display.cpp</locationURI>
-		</link>
-		<link>
-			<name>display.h</name>
-			<type>1</type>
-			<locationURI>PARENT-0-PROJECT_LOC/display.h</locationURI>
-		</link>
-		<link>
-			<name>game.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-0-PROJECT_LOC/game.cpp</locationURI>
-		</link>
-		<link>
-			<name>game.h</name>
-			<type>1</type>
-			<locationURI>PARENT-0-PROJECT_LOC/game.h</locationURI>
 		</link>
 		<link>
 			<name>timerLib.cpp</name>

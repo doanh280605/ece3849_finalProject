@@ -11,12 +11,15 @@ ORDERED_OBJS += \
 "./Crystalfontz128x128_ST7735.obj" \
 "./HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj" \
 "./button.obj" \
-"./buzzer.obj" \
-"./display.obj" \
-"./game.obj" \
-"./joystick.obj" \
+"./controller_logic.obj" \
+"./debug_uart.obj" \
 "./main.obj" \
+"./motor.obj" \
+"./safety.obj" \
+"./sensor.obj" \
 "./startup_ccs.obj" \
+"./system_tasks.obj" \
+"./wireless.obj" \
 "./timerLib.obj" \
 "./FreeRTOS/croutine.obj" \
 "./FreeRTOS/event_groups.obj" \
@@ -145,30 +148,30 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-ece3849_lab3_lphung_shtran.out 
+ece3849_finalProject_lphung_shtran.out 
 
 EXE_OUTPUTS__QUOTED += \
-"ece3849_lab3_lphung_shtran.out" 
+"ece3849_finalProject_lphung_shtran.out" 
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "ece3849_lab3_lphung_shtran.out"
+	@$(MAKE) --no-print-directory -Onone "ece3849_finalProject_lphung_shtran.out"
 
 # Tool invocations
-ece3849_lab3_lphung_shtran.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+ece3849_finalProject_lphung_shtran.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
-	"/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C1294NCPDT -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"ece3849_lab3_lphung_shtran.map" --heap_size=0 --stack_size=2048 -i"/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="ece3849_lab3_lphung_shtran_linkInfo.xml" --rom_model -o "ece3849_lab3_lphung_shtran.out" $(ORDERED_OBJS)
+	"/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C1294NCPDT -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"ece3849_finalProject_lphung_shtran.map" --heap_size=0 --stack_size=2048 -i"/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="ece3849_finalProject_lphung_shtran_linkInfo.xml" --rom_model -o "ece3849_finalProject_lphung_shtran.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "Crystalfontz128x128_ST7735.obj" "HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj" "button.obj" "buzzer.obj" "display.obj" "game.obj" "joystick.obj" "main.obj" "startup_ccs.obj" "timerLib.obj" "FreeRTOS/croutine.obj" "FreeRTOS/event_groups.obj" "FreeRTOS/list.obj" "FreeRTOS/queue.obj" "FreeRTOS/stream_buffer.obj" "FreeRTOS/tasks.obj" "FreeRTOS/timers.obj" "FreeRTOS/portable/CCS/ARM_CM4F/port.obj" "FreeRTOS/portable/CCS/ARM_CM4F/portasm.obj" "FreeRTOS/portable/MemMang/heap_4.obj" 
+	-$(RM) "Crystalfontz128x128_ST7735.obj" "HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj" "button.obj" "controller_logic.obj" "debug_uart.obj" "main.obj" "motor.obj" "safety.obj" "sensor.obj" "startup_ccs.obj" "system_tasks.obj" "timerLib.obj" "wireless.obj" "FreeRTOS/croutine.obj" "FreeRTOS/event_groups.obj" "FreeRTOS/list.obj" "FreeRTOS/queue.obj" "FreeRTOS/stream_buffer.obj" "FreeRTOS/tasks.obj" "FreeRTOS/timers.obj" "FreeRTOS/portable/CCS/ARM_CM4F/port.obj" "FreeRTOS/portable/CCS/ARM_CM4F/portasm.obj" "FreeRTOS/portable/MemMang/heap_4.obj" 
 	-$(RM) "Crystalfontz128x128_ST7735.d" "HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.d" "startup_ccs.d" "FreeRTOS/croutine.d" "FreeRTOS/event_groups.d" "FreeRTOS/list.d" "FreeRTOS/queue.d" "FreeRTOS/stream_buffer.d" "FreeRTOS/tasks.d" "FreeRTOS/timers.d" "FreeRTOS/portable/CCS/ARM_CM4F/port.d" "FreeRTOS/portable/MemMang/heap_4.d" 
-	-$(RM) "button.d" "buzzer.d" "display.d" "game.d" "joystick.d" "main.d" "timerLib.d" 
+	-$(RM) "button.d" "controller_logic.d" "debug_uart.d" "main.d" "motor.d" "safety.d" "sensor.d" "system_tasks.d" "timerLib.d" "wireless.d" 
 	-$(RM) "FreeRTOS/portable/CCS/ARM_CM4F/portasm.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
@@ -177,4 +180,3 @@ clean:
 .SECONDARY:
 
 -include ../makefile.targets
-

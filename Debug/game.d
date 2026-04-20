@@ -1,7 +1,7 @@
 # FIXED
 
-game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/game.cpp
-game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/game.h
+game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/game.cpp
+game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/game.h
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stdbool.h
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__config
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__config_site
@@ -18,12 +18,12 @@ game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/incl
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_types.h
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_stdint.h
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_stdint.h
-game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/app_objects.h
-game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/FreeRTOS.h
+game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/app_objects.h
+game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/FreeRTOS.h
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stddef.h
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stddef.h
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__nullptr
-game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/FreeRTOSConfig.h
+game.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/FreeRTOSConfig.h
 game.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/projdefs.h
 game.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/portable.h
 game.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/deprecated_definitions.h
@@ -39,9 +39,9 @@ game.obj: /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/grlib/grlib.h
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stdlib.h
 game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/game.cpp:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/game.cpp:
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/game.h:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/game.h:
 
 /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stdbool.h:
 
@@ -75,9 +75,9 @@ game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/incl
 
 /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_stdint.h:
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/app_objects.h:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/app_objects.h:
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/FreeRTOS.h:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/FreeRTOS.h:
 
 /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stddef.h:
 
@@ -85,7 +85,7 @@ game.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/incl
 
 /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__nullptr:
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/FreeRTOSConfig.h:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/FreeRTOSConfig.h:
 
 /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/projdefs.h:
 

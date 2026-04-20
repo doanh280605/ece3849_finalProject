@@ -5,11 +5,14 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 /Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver/button.cpp \
-../buzzer.cpp \
-../display.cpp \
-../game.cpp \
-../joystick.cpp \
+../controller_logic.cpp \
+../debug_uart.cpp \
 ../main.cpp \
+../motor.cpp \
+../safety.cpp \
+../sensor.cpp \
+../system_tasks.cpp \
+../wireless.cpp \
 /Users/Doanh/Documents/ECE_3849/lab1/libraries/timerLib/timerLib.cpp 
 
 CMD_SRCS += \
@@ -29,33 +32,42 @@ OBJS += \
 ./Crystalfontz128x128_ST7735.obj \
 ./HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj \
 ./button.obj \
-./buzzer.obj \
-./display.obj \
-./game.obj \
-./joystick.obj \
+./controller_logic.obj \
+./debug_uart.obj \
 ./main.obj \
+./motor.obj \
+./safety.obj \
+./sensor.obj \
 ./startup_ccs.obj \
+./system_tasks.obj \
+./wireless.obj \
 ./timerLib.obj 
 
 CPP_DEPS += \
 ./button.d \
-./buzzer.d \
-./display.d \
-./game.d \
-./joystick.d \
+./controller_logic.d \
+./debug_uart.d \
 ./main.d \
+./motor.d \
+./safety.d \
+./sensor.d \
+./system_tasks.d \
+./wireless.d \
 ./timerLib.d 
 
 OBJS__QUOTED += \
 "Crystalfontz128x128_ST7735.obj" \
 "HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.obj" \
 "button.obj" \
-"buzzer.obj" \
-"display.obj" \
-"game.obj" \
-"joystick.obj" \
+"controller_logic.obj" \
+"debug_uart.obj" \
 "main.obj" \
+"motor.obj" \
+"safety.obj" \
+"sensor.obj" \
 "startup_ccs.obj" \
+"system_tasks.obj" \
+"wireless.obj" \
 "timerLib.obj" 
 
 C_DEPS__QUOTED += \
@@ -65,11 +77,14 @@ C_DEPS__QUOTED += \
 
 CPP_DEPS__QUOTED += \
 "button.d" \
-"buzzer.d" \
-"display.d" \
-"game.d" \
-"joystick.d" \
+"controller_logic.d" \
+"debug_uart.d" \
 "main.d" \
+"motor.d" \
+"safety.d" \
+"sensor.d" \
+"system_tasks.d" \
+"wireless.d" \
 "timerLib.d" 
 
 C_SRCS__QUOTED += \
@@ -79,11 +94,13 @@ C_SRCS__QUOTED += \
 
 CPP_SRCS__QUOTED += \
 "/Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver/button.cpp" \
-"../buzzer.cpp" \
-"../display.cpp" \
-"../game.cpp" \
-"../joystick.cpp" \
+"../controller_logic.cpp" \
+"../debug_uart.cpp" \
 "../main.cpp" \
+"../motor.cpp" \
+"../safety.cpp" \
+"../sensor.cpp" \
+"../system_tasks.cpp" \
+"../wireless.cpp" \
 "/Users/Doanh/Documents/ECE_3849/lab1/libraries/timerLib/timerLib.cpp" 
-
 

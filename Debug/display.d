@@ -1,6 +1,6 @@
 # FIXED
 
-display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/display.cpp
+display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/display.cpp
 display.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stdint.h
 display.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__config
 display.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__config_site
@@ -22,12 +22,12 @@ display.obj: /Users/Doanh/Documents/ECE_3849/lab1/libraries/display/Crystalfontz
 display.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stdbool.h
 display.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h
 display.obj: /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/grlib/grlib.h
-display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/app_objects.h
-display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/FreeRTOS.h
+display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/app_objects.h
+display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/FreeRTOS.h
 display.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stddef.h
 display.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stddef.h
 display.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__nullptr
-display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/FreeRTOSConfig.h
+display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/FreeRTOSConfig.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/projdefs.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/portable.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/deprecated_definitions.h
@@ -39,9 +39,9 @@ display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/task.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/list.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/semphr.h
 display.obj: /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/queue.h
-display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/game.h
+display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/game.h
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/display.cpp:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/display.cpp:
 
 /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stdint.h:
 
@@ -85,9 +85,9 @@ display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/gam
 
 /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/grlib/grlib.h:
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/app_objects.h:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/app_objects.h:
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/FreeRTOS.h:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/FreeRTOS.h:
 
 /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stddef.h:
 
@@ -95,7 +95,7 @@ display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/gam
 
 /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__nullptr:
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/FreeRTOSConfig.h:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/FreeRTOSConfig.h:
 
 /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/projdefs.h:
 
@@ -119,5 +119,5 @@ display.obj: /Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/gam
 
 /Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/include/queue.h:
 
-/Users/Doanh/Documents/ECE_3849/lab1/ece3849_lab3_lphung_shtran/game.h:
+/Users/Doanh/Documents/ECE_3849/lab1/ece3849_finalProject_lphung_shtran/game.h:
 
