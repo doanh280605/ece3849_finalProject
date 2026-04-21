@@ -1,7 +1,11 @@
-#pragma once
+#ifndef DEBUG_UART_H
+#define DEBUG_UART_H
 
 #include "app_types.h"
 
-void DebugUart_Init(uint32_t systemClockHz);
-void DebugUart_Log(const char *message);
-void DebugUart_LogState(const AppContext &appContext);
+void DebugUART_Init(void);
+void DebugUART_Print(const char *msg);
+void DebugUART_PrintState(const AppContext *appContext);
+void DebugUART_PrintSafetyEvent(const AppContext *appContext);
+
+#endif

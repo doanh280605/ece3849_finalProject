@@ -28,7 +28,7 @@ int main(void)
 
     ConfigureSystemClock();
 
-    DebugUart_Init(gSystemClockHz);
+    DebugUART_Init();
     Sensor_Init();
     Motor_Init();
     Wireless_Init();

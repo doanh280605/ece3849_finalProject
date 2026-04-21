@@ -97,6 +97,7 @@ static void WirelessTask(void *pvParameters)
 static void SafetyTask(void *pvParameters)
 {
     (void)pvParameters;
+    bool previousSafetyStopActive = false;
 
     for (;;) {
         xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
@@ -113,6 +114,10 @@ static void SafetyTask(void *pvParameters)
             gAppContext.car.safetyStopActive = true;
             UpdateMotorStateCache(gAppContext.motor, CMD_STOP, 0U);
         }
+        if (!previousSafetyStopActive && gAppContext.car.safetyStopActive) {
+            DebugUART_PrintSafetyEvent(&gAppContext);
+        }
+        previousSafetyStopActive = gAppContext.car.safetyStopActive;
         xSemaphoreGive(gAppContext.lock);
         vTaskDelay(pdMS_TO_TICKS(kSafetyTaskPeriodMs));
     }
@@ -168,7 +173,7 @@ static void DebugTask(void *pvParameters)
 
     for (;;) {
         xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        DebugUart_LogState(gAppContext);
+        DebugUART_PrintState(&gAppContext);
         xSemaphoreGive(gAppContext.lock);
         vTaskDelay(pdMS_TO_TICKS(kDebugTaskPeriodMs));
     }

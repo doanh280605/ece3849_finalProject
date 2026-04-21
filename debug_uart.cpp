@@ -1,18 +1,94 @@
 #include "debug_uart.h"
 
-#include <stddef.h>
+#include <stdio.h>
 
-void DebugUart_Init(uint32_t systemClockHz)
+static const char *MotionCommandToString(MotionCommand motion);
+static const char *DriveModeToString(DriveMode mode);
+
+void DebugUART_Init(void)
 {
-    (void)systemClockHz;
 }
 
-void DebugUart_Log(const char *message)
+void DebugUART_Print(const char *msg)
 {
-    (void)message;
+    if (msg == NULL) {
+        return;
+    }
+
+    puts(msg);
 }
 
-void DebugUart_LogState(const AppContext &appContext)
+void DebugUART_PrintState(const AppContext *appContext)
 {
-    (void)appContext;
+    char buffer[192];
+
+    if (appContext == NULL) {
+        return;
+    }
+
+    (void)snprintf(
+        buffer,
+        sizeof(buffer),
+        "CMD rx=%s spd=%u mode=%s dist=%.1f obs=%d final=%s motor(L=%d,R=%d,en=%d)",
+        MotionCommandToString(appContext->wirelessCommand.motion),
+        (unsigned int)appContext->wirelessCommand.speedPercent,
+        DriveModeToString(appContext->car.mode),
+        (double)appContext->sensor.distanceCm,
+        appContext->sensor.obstacleDetected ? 1 : 0,
+        MotionCommandToString(appContext->car.finalMotion),
+        (int)appContext->motor.leftPwmPercent,
+        (int)appContext->motor.rightPwmPercent,
+        appContext->motor.driverEnabled ? 1 : 0);
+    DebugUART_Print(buffer);
+}
+
+void DebugUART_PrintSafetyEvent(const AppContext *appContext)
+{
+    char buffer[160];
+
+    if (appContext == NULL) {
+        return;
+    }
+
+    (void)snprintf(
+        buffer,
+        sizeof(buffer),
+        "SAFETY override timeout=%d obstacle=%d sensorFault=%d final=%s",
+        appContext->safety.signalTimeout ? 1 : 0,
+        appContext->safety.obstacleStop ? 1 : 0,
+        appContext->safety.sensorFault ? 1 : 0,
+        MotionCommandToString(appContext->car.finalMotion));
+    DebugUART_Print(buffer);
+}
+
+static const char *MotionCommandToString(MotionCommand motion)
+{
+    switch (motion) {
+        case CMD_FORWARD:
+            return "FWD";
+        case CMD_REVERSE:
+            return "REV";
+        case CMD_LEFT:
+            return "LEFT";
+        case CMD_RIGHT:
+            return "RIGHT";
+        case CMD_BRAKE:
+            return "BRAKE";
+        case CMD_STOP:
+        default:
+            return "STOP";
+    }
+}
+
+static const char *DriveModeToString(DriveMode mode)
+{
+    switch (mode) {
+        case AUTO_AVOID_MODE:
+            return "AUTO";
+        case SAFE_STOP_MODE:
+            return "SAFE";
+        case MANUAL_MODE:
+        default:
+            return "MANUAL";
+    }
 }
