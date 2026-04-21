@@ -22,6 +22,10 @@ static void SafetyTask(void *pvParameters);
 static void ControlTask(void *pvParameters);
 static void MotorTask(void *pvParameters);
 static void DebugTask(void *pvParameters);
+static void UpdateMotorStateCache(
+    MotorState &motorState,
+    MotionCommand motion,
+    uint8_t speedPercent);
 
 void SystemTasks_InitContext(void)
 {
@@ -101,7 +105,7 @@ static void SafetyTask(void *pvParameters)
             gAppContext.car.finalMotion = CMD_STOP;
             gAppContext.car.speedPercent = 0U;
             gAppContext.car.safetyStopActive = true;
-            Motor_Stop(gAppContext.motor);
+            UpdateMotorStateCache(gAppContext.motor, CMD_STOP, 0U);
         }
         xSemaphoreGive(gAppContext.lock);
         vTaskDelay(pdMS_TO_TICKS(kSafetyTaskPeriodMs));
@@ -136,10 +140,14 @@ static void MotorTask(void *pvParameters)
         if (gAppContext.car.safetyStopActive ||
             gAppContext.car.finalMotion == CMD_STOP ||
             gAppContext.car.finalMotion == CMD_BRAKE) {
-            Motor_Stop(gAppContext.motor);
+            UpdateMotorStateCache(gAppContext.motor, CMD_STOP, 0U);
+            Motor_Stop();
         } else {
-            Motor_Apply(
+            UpdateMotorStateCache(
                 gAppContext.motor,
+                gAppContext.car.finalMotion,
+                gAppContext.car.speedPercent);
+            Motor_SetCommand(
                 gAppContext.car.finalMotion,
                 gAppContext.car.speedPercent);
         }
@@ -157,5 +165,45 @@ static void DebugTask(void *pvParameters)
         DebugUart_LogState(gAppContext);
         xSemaphoreGive(gAppContext.lock);
         vTaskDelay(pdMS_TO_TICKS(kDebugTaskPeriodMs));
+    }
+}
+
+static void UpdateMotorStateCache(
+    MotorState &motorState,
+    MotionCommand motion,
+    uint8_t speedPercent)
+{
+    if (speedPercent > 100U) {
+        speedPercent = 100U;
+    }
+
+    switch (motion) {
+        case CMD_FORWARD:
+            motorState.leftPwmPercent = (int16_t)speedPercent;
+            motorState.rightPwmPercent = (int16_t)speedPercent;
+            motorState.driverEnabled = (speedPercent > 0U);
+            break;
+        case CMD_REVERSE:
+            motorState.leftPwmPercent = -(int16_t)speedPercent;
+            motorState.rightPwmPercent = -(int16_t)speedPercent;
+            motorState.driverEnabled = (speedPercent > 0U);
+            break;
+        case CMD_LEFT:
+            motorState.leftPwmPercent = (int16_t)(speedPercent / 2U);
+            motorState.rightPwmPercent = (int16_t)speedPercent;
+            motorState.driverEnabled = (speedPercent > 0U);
+            break;
+        case CMD_RIGHT:
+            motorState.leftPwmPercent = (int16_t)speedPercent;
+            motorState.rightPwmPercent = (int16_t)(speedPercent / 2U);
+            motorState.driverEnabled = (speedPercent > 0U);
+            break;
+        case CMD_BRAKE:
+        case CMD_STOP:
+        default:
+            motorState.leftPwmPercent = 0;
+            motorState.rightPwmPercent = 0;
+            motorState.driverEnabled = false;
+            break;
     }
 }
