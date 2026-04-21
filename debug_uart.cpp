@@ -44,6 +44,26 @@ void DebugUART_PrintState(const AppContext *appContext)
     DebugUART_Print(buffer);
 }
 
+void DebugUART_PrintTransition(const AppContext *appContext)
+{
+    char buffer[160];
+
+    if (appContext == NULL) {
+        return;
+    }
+
+    (void)snprintf(
+        buffer,
+        sizeof(buffer),
+        "STATE mode=%s cmd=%s final=%s safety=%d steer=%d",
+        DriveModeToString(appContext->car.mode),
+        MotionCommandToString(appContext->car.commandedMotion),
+        MotionCommandToString(appContext->car.finalMotion),
+        appContext->car.safetyStopActive ? 1 : 0,
+        (int)appContext->car.steeringPercent);
+    DebugUART_Print(buffer);
+}
+
 void DebugUART_PrintSafetyEvent(const AppContext *appContext)
 {
     char buffer[160];

@@ -274,6 +274,8 @@ static void SafetyMonitorTask(void *pvParameters)
 static void DebugTask(void *pvParameters)
 {
     (void)pvParameters;
+    AppContext previousSnapshot = {};
+    bool firstSample = true;
 
     for (;;) {
         AppContext snapshot = {};
@@ -281,6 +283,17 @@ static void DebugTask(void *pvParameters)
         xSemaphoreTake(gStateMutex, portMAX_DELAY);
         BuildSnapshot(&snapshot);
         xSemaphoreGive(gStateMutex);
+
+        if (firstSample ||
+            snapshot.car.mode != previousSnapshot.car.mode ||
+            snapshot.car.commandedMotion != previousSnapshot.car.commandedMotion ||
+            snapshot.car.finalMotion != previousSnapshot.car.finalMotion ||
+            snapshot.car.safetyStopActive != previousSnapshot.car.safetyStopActive ||
+            snapshot.sensor.obstacleDetected != previousSnapshot.sensor.obstacleDetected) {
+            DebugUART_PrintTransition(&snapshot);
+            previousSnapshot = snapshot;
+            firstSample = false;
+        }
 
         DebugUART_PrintState(&snapshot);
         vTaskDelay(pdMS_TO_TICKS(kDebugTaskPeriodMs));

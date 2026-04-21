@@ -35,17 +35,25 @@ void Wireless_MockInput(WirelessCommand *cmd)
     cmd->mode = MANUAL_MODE;
     cmd->speedPercent = 50U;
 
-    if (phase < 200U) {
+    if (phase < 140U) {
         cmd->motion = CMD_FORWARD;
-    } else if (phase < 300U) {
+    } else if (phase < 200U) {
+        cmd->motion = CMD_STOP;
+    } else if (phase < 280U) {
         cmd->motion = CMD_LEFT;
-    } else if (phase < 400U) {
+    } else if (phase < 360U) {
         cmd->motion = CMD_RIGHT;
+    } else if (phase < 430U) {
+        cmd->motion = CMD_FORWARD;
+    } else if (phase < 520U) {
+        cmd->motion = CMD_FORWARD;
+        cmd->mode = AUTO_AVOID_MODE;
+        cmd->speedPercent = 60U;
     } else {
         cmd->motion = CMD_STOP;
     }
 
-    if (phase > 500U) {
+    if (phase > 620U) {
         phase = 0U;
     }
 }

@@ -26,12 +26,17 @@ void Sensor_MockRead(SensorData *data)
     data->imuHealthy = true;
     data->yawRateDps = 0.0f;
 
-    if ((tick > 250U) && (tick < 320U)) {
+    if ((tick > 365U) && (tick < 410U)) {
         data->distanceCm = 10.0f;
         data->obstacleDetected = true;
     }
 
-    if (tick > 500U) {
+    if ((tick > 455U) && (tick < 500U)) {
+        data->distanceCm = 12.0f;
+        data->obstacleDetected = true;
+    }
+
+    if (tick > 620U) {
         tick = 0U;
     }
 }
