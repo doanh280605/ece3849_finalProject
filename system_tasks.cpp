@@ -70,7 +70,7 @@ static void SensorTask(void *pvParameters)
 
     for (;;) {
         xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        gAppContext.sensor = Sensor_Read();
+        Sensor_Read(&gAppContext.sensor);
         xSemaphoreGive(gAppContext.lock);
         vTaskDelay(pdMS_TO_TICKS(kSensorTaskPeriodMs));
     }
