@@ -20,6 +20,7 @@ static void SensorTask(void *pvParameters);
 static void WirelessTask(void *pvParameters);
 static void SafetyTask(void *pvParameters);
 static void ControlTask(void *pvParameters);
+static void MotorTask(void *pvParameters);
 static void DebugTask(void *pvParameters);
 
 void SystemTasks_InitContext(void)
@@ -46,6 +47,8 @@ bool SystemTasks_Create(void)
         SafetyTask, "Safety", kDefaultTaskStackWords, NULL, kSafetyTaskPriority, NULL);
     const BaseType_t controlOk = xTaskCreate(
         ControlTask, "Control", kDefaultTaskStackWords, NULL, kControlTaskPriority, NULL);
+    const BaseType_t motorOk = xTaskCreate(
+        MotorTask, "Motor", kDefaultTaskStackWords, NULL, kControlTaskPriority, NULL);
     const BaseType_t debugOk = xTaskCreate(
         DebugTask, "Debug", kDefaultTaskStackWords, NULL, kDebugTaskPriority, NULL);
 
@@ -53,6 +56,7 @@ bool SystemTasks_Create(void)
            (wirelessOk == pdPASS) &&
            (safetyOk == pdPASS) &&
            (controlOk == pdPASS) &&
+           (motorOk == pdPASS) &&
            (debugOk == pdPASS);
 }
 
@@ -110,7 +114,35 @@ static void ControlTask(void *pvParameters)
 
     for (;;) {
         xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        ControllerLogic_RunCycle(gAppContext);
+        gAppContext.car.signalAlive = !gAppContext.safety.signalTimeout;
+        if (gAppContext.safety.signalTimeout || gAppContext.safety.sensorFault) {
+            gAppContext.car.signalAlive = false;
+        }
+        ControllerLogic_Update(
+            gAppContext.wirelessCommand,
+            gAppContext.sensor,
+            gAppContext.car);
+        xSemaphoreGive(gAppContext.lock);
+        vTaskDelay(pdMS_TO_TICKS(kControlTaskPeriodMs));
+    }
+}
+
+static void MotorTask(void *pvParameters)
+{
+    (void)pvParameters;
+
+    for (;;) {
+        xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
+        if (gAppContext.car.safetyStopActive ||
+            gAppContext.car.finalMotion == CMD_STOP ||
+            gAppContext.car.finalMotion == CMD_BRAKE) {
+            Motor_Stop(gAppContext.motor);
+        } else {
+            Motor_Apply(
+                gAppContext.motor,
+                gAppContext.car.finalMotion,
+                gAppContext.car.speedPercent);
+        }
         xSemaphoreGive(gAppContext.lock);
         vTaskDelay(pdMS_TO_TICKS(kControlTaskPeriodMs));
     }
