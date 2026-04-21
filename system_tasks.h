@@ -1,9 +1,10 @@
-#pragma once
+#ifndef SYSTEM_TASKS_H
+#define SYSTEM_TASKS_H
 
-#include "app_types.h"
+#include <stdint.h>
 
 extern uint32_t gSystemClockHz;
-extern AppContext gAppContext;
 
-void SystemTasks_InitContext(void);
-bool SystemTasks_Create(void);
+void Tasks_Create(void);
+
+#endif

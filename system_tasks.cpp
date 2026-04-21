@@ -1,6 +1,7 @@
 #include "system_tasks.h"
 
 #include "app_config.h"
+#include "app_types.h"
 #include "controller_logic.h"
 #include "debug_uart.h"
 #include "motor.h"
@@ -10,58 +11,151 @@
 
 extern "C" {
 #include "FreeRTOS.h"
+#include "semphr.h"
 #include "task.h"
 }
 
 uint32_t gSystemClockHz = 0U;
-AppContext gAppContext = {};
 
+static WirelessCommand gCmd = {CMD_STOP, 0U, MANUAL_MODE, false, 0U, 0U};
+static SensorData gSensor = {100.0f, false, true, true, 0.0f};
+static CarState gState = {MANUAL_MODE, CMD_STOP, CMD_STOP, 0U, 0, false, false, false};
+static MotorState gMotor = {0, 0, false};
+static SafetyState gSafety = {true, false, false};
+
+static SemaphoreHandle_t gStateMutex = NULL;
+
+static void WirelessRxTask(void *pvParameters);
 static void SensorTask(void *pvParameters);
-static void WirelessTask(void *pvParameters);
-static void SafetyTask(void *pvParameters);
 static void ControlTask(void *pvParameters);
 static void MotorTask(void *pvParameters);
+static void SafetyMonitorTask(void *pvParameters);
 static void DebugTask(void *pvParameters);
-static void UpdateMotorStateCache(
-    MotorState &motorState,
-    MotionCommand motion,
-    uint8_t speedPercent);
 
-void SystemTasks_InitContext(void)
-{
-    gAppContext.wirelessCommand = {CMD_STOP, 0U, MANUAL_MODE, false, 0U, 0U};
-    gAppContext.sensor = {100.0f, false, true, true, 0.0f};
-    gAppContext.car = {MANUAL_MODE, CMD_STOP, CMD_STOP, 0U, 0, false, false, false};
-    gAppContext.motor = {0, 0, false};
-    gAppContext.safety = {true, false, false};
-    gAppContext.lock = xSemaphoreCreateMutex();
-}
+static void InitializeSharedState(void);
+static void UpdateMotorStateCache(MotionCommand motion, uint8_t speedPercent);
+static void BuildSnapshot(AppContext *appContext);
 
-bool SystemTasks_Create(void)
+static const uint32_t kWirelessPeriodMs = 20U;
+static const uint32_t kSensorPeriodMs = 50U;
+static const uint32_t kControlPeriodMs = 20U;
+static const uint32_t kMotorPeriodMs = 20U;
+static const uint32_t kSafetyPeriodMs = 100U;
+static const uint32_t kSignalTimeoutMs = 250U;
+
+void Tasks_Create(void)
 {
-    if (gAppContext.lock == NULL) {
-        return false;
+    BaseType_t status = pdPASS;
+
+    InitializeSharedState();
+    gStateMutex = xSemaphoreCreateMutex();
+
+    if (gStateMutex == NULL) {
+        DebugUART_Print("ERROR: failed to create gStateMutex");
+        while (1) {
+        }
     }
 
-    const BaseType_t sensorOk = xTaskCreate(
-        SensorTask, "Sensor", kDefaultTaskStackWords, NULL, kSensorTaskPriority, NULL);
-    const BaseType_t wirelessOk = xTaskCreate(
-        WirelessTask, "Wireless", kDefaultTaskStackWords, NULL, kWirelessTaskPriority, NULL);
-    const BaseType_t safetyOk = xTaskCreate(
-        SafetyTask, "Safety", kDefaultTaskStackWords, NULL, kSafetyTaskPriority, NULL);
-    const BaseType_t controlOk = xTaskCreate(
-        ControlTask, "Control", kDefaultTaskStackWords, NULL, kControlTaskPriority, NULL);
-    const BaseType_t motorOk = xTaskCreate(
-        MotorTask, "Motor", kDefaultTaskStackWords, NULL, kControlTaskPriority, NULL);
-    const BaseType_t debugOk = xTaskCreate(
-        DebugTask, "Debug", kDefaultTaskStackWords, NULL, kDebugTaskPriority, NULL);
+    status &= xTaskCreate(
+        WirelessRxTask,
+        "WirelessRx",
+        kDefaultTaskStackWords,
+        NULL,
+        kWirelessTaskPriority,
+        NULL);
+    status &= xTaskCreate(
+        SensorTask,
+        "Sensor",
+        kDefaultTaskStackWords,
+        NULL,
+        kSensorTaskPriority,
+        NULL);
+    status &= xTaskCreate(
+        ControlTask,
+        "Control",
+        kDefaultTaskStackWords,
+        NULL,
+        kControlTaskPriority,
+        NULL);
+    status &= xTaskCreate(
+        MotorTask,
+        "Motor",
+        kDefaultTaskStackWords,
+        NULL,
+        kControlTaskPriority,
+        NULL);
+    status &= xTaskCreate(
+        SafetyMonitorTask,
+        "Safety",
+        kDefaultTaskStackWords,
+        NULL,
+        kSafetyTaskPriority,
+        NULL);
+    status &= xTaskCreate(
+        DebugTask,
+        "Debug",
+        kDefaultTaskStackWords,
+        NULL,
+        kDebugTaskPriority,
+        NULL);
 
-    return (sensorOk == pdPASS) &&
-           (wirelessOk == pdPASS) &&
-           (safetyOk == pdPASS) &&
-           (controlOk == pdPASS) &&
-           (motorOk == pdPASS) &&
-           (debugOk == pdPASS);
+    if (status != pdPASS) {
+        DebugUART_Print("ERROR: failed to create RTOS tasks");
+        while (1) {
+        }
+    }
+}
+
+static void InitializeSharedState(void)
+{
+    gCmd.motion = CMD_STOP;
+    gCmd.speedPercent = 0U;
+    gCmd.mode = MANUAL_MODE;
+    gCmd.valid = false;
+    gCmd.sequenceNumber = 0U;
+    gCmd.receivedTick = 0U;
+
+    gSensor.distanceCm = 100.0f;
+    gSensor.obstacleDetected = false;
+    gSensor.ultrasonicHealthy = true;
+    gSensor.imuHealthy = true;
+    gSensor.yawRateDps = 0.0f;
+
+    gState.mode = MANUAL_MODE;
+    gState.commandedMotion = CMD_STOP;
+    gState.finalMotion = CMD_STOP;
+    gState.speedPercent = 0U;
+    gState.steeringPercent = 0;
+    gState.signalAlive = false;
+    gState.safetyStopActive = false;
+    gState.brakeActive = false;
+
+    gMotor.leftPwmPercent = 0;
+    gMotor.rightPwmPercent = 0;
+    gMotor.driverEnabled = false;
+
+    gSafety.signalTimeout = true;
+    gSafety.obstacleStop = false;
+    gSafety.sensorFault = false;
+}
+
+static void WirelessRxTask(void *pvParameters)
+{
+    (void)pvParameters;
+
+    for (;;) {
+        WirelessCommand temp = {};
+
+        if (Wireless_GetLatestCommand(&temp)) {
+            xSemaphoreTake(gStateMutex, portMAX_DELAY);
+            temp.sequenceNumber = gCmd.sequenceNumber + 1U;
+            gCmd = temp;
+            gState.signalAlive = true;
+            xSemaphoreGive(gStateMutex);
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(kWirelessPeriodMs));
+    }
 }
 
 static void SensorTask(void *pvParameters)
@@ -69,57 +163,14 @@ static void SensorTask(void *pvParameters)
     (void)pvParameters;
 
     for (;;) {
-        xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        Sensor_Read(&gAppContext.sensor);
-        xSemaphoreGive(gAppContext.lock);
-        vTaskDelay(pdMS_TO_TICKS(kSensorTaskPeriodMs));
-    }
-}
+        SensorData temp = {};
+        Sensor_Read(&temp);
 
-static void WirelessTask(void *pvParameters)
-{
-    (void)pvParameters;
+        xSemaphoreTake(gStateMutex, portMAX_DELAY);
+        gSensor = temp;
+        xSemaphoreGive(gStateMutex);
 
-    for (;;) {
-        xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        if (Wireless_GetLatestCommand(&gAppContext.wirelessCommand)) {
-            gAppContext.wirelessCommand.sequenceNumber++;
-            gAppContext.car.signalAlive = true;
-        } else {
-            gAppContext.wirelessCommand.valid = false;
-            gAppContext.car.signalAlive = false;
-        }
-        xSemaphoreGive(gAppContext.lock);
-        vTaskDelay(pdMS_TO_TICKS(kWirelessTaskPeriodMs));
-    }
-}
-
-static void SafetyTask(void *pvParameters)
-{
-    (void)pvParameters;
-    bool previousSafetyStopActive = false;
-
-    for (;;) {
-        xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        gAppContext.safety = Safety_Evaluate(
-            gAppContext.wirelessCommand,
-            gAppContext.sensor,
-            gAppContext.car);
-        if (gAppContext.safety.signalTimeout ||
-            gAppContext.safety.sensorFault ||
-            gAppContext.safety.obstacleStop) {
-            gAppContext.car.mode = SAFE_STOP_MODE;
-            gAppContext.car.finalMotion = CMD_STOP;
-            gAppContext.car.speedPercent = 0U;
-            gAppContext.car.safetyStopActive = true;
-            UpdateMotorStateCache(gAppContext.motor, CMD_STOP, 0U);
-        }
-        if (!previousSafetyStopActive && gAppContext.car.safetyStopActive) {
-            DebugUART_PrintSafetyEvent(&gAppContext);
-        }
-        previousSafetyStopActive = gAppContext.car.safetyStopActive;
-        xSemaphoreGive(gAppContext.lock);
-        vTaskDelay(pdMS_TO_TICKS(kSafetyTaskPeriodMs));
+        vTaskDelay(pdMS_TO_TICKS(kSensorPeriodMs));
     }
 }
 
@@ -128,17 +179,11 @@ static void ControlTask(void *pvParameters)
     (void)pvParameters;
 
     for (;;) {
-        xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        gAppContext.car.signalAlive = !gAppContext.safety.signalTimeout;
-        if (gAppContext.safety.signalTimeout || gAppContext.safety.sensorFault) {
-            gAppContext.car.signalAlive = false;
-        }
-        ControllerLogic_Update(
-            gAppContext.wirelessCommand,
-            gAppContext.sensor,
-            gAppContext.car);
-        xSemaphoreGive(gAppContext.lock);
-        vTaskDelay(pdMS_TO_TICKS(kControlTaskPeriodMs));
+        xSemaphoreTake(gStateMutex, portMAX_DELAY);
+        ControllerLogic_Update(gCmd, gSensor, gState);
+        xSemaphoreGive(gStateMutex);
+
+        vTaskDelay(pdMS_TO_TICKS(kControlPeriodMs));
     }
 }
 
@@ -147,23 +192,69 @@ static void MotorTask(void *pvParameters)
     (void)pvParameters;
 
     for (;;) {
-        xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        if (gAppContext.car.safetyStopActive ||
-            gAppContext.car.finalMotion == CMD_STOP ||
-            gAppContext.car.finalMotion == CMD_BRAKE) {
-            UpdateMotorStateCache(gAppContext.motor, CMD_STOP, 0U);
+        MotionCommand motion = CMD_STOP;
+        uint8_t speedPercent = 0U;
+
+        xSemaphoreTake(gStateMutex, portMAX_DELAY);
+        motion = gState.finalMotion;
+        speedPercent = gState.speedPercent;
+        UpdateMotorStateCache(motion, speedPercent);
+        xSemaphoreGive(gStateMutex);
+
+        if (motion == CMD_STOP || motion == CMD_BRAKE) {
             Motor_Stop();
         } else {
-            UpdateMotorStateCache(
-                gAppContext.motor,
-                gAppContext.car.finalMotion,
-                gAppContext.car.speedPercent);
-            Motor_SetCommand(
-                gAppContext.car.finalMotion,
-                gAppContext.car.speedPercent);
+            Motor_SetCommand(motion, speedPercent);
         }
-        xSemaphoreGive(gAppContext.lock);
-        vTaskDelay(pdMS_TO_TICKS(kControlTaskPeriodMs));
+
+        vTaskDelay(pdMS_TO_TICKS(kMotorPeriodMs));
+    }
+}
+
+static void SafetyMonitorTask(void *pvParameters)
+{
+    (void)pvParameters;
+    bool previousOverride = false;
+
+    for (;;) {
+        AppContext snapshot = {};
+
+        xSemaphoreTake(gStateMutex, portMAX_DELAY);
+
+        if (gCmd.receivedTick == 0U) {
+            gSafety.signalTimeout = true;
+        } else {
+            const TickType_t commandAgeTicks = xTaskGetTickCount() - gCmd.receivedTick;
+            gSafety.signalTimeout = commandAgeTicks > pdMS_TO_TICKS(kSignalTimeoutMs);
+        }
+
+        gState.signalAlive = !gSafety.signalTimeout;
+        gSafety.sensorFault = !gSensor.ultrasonicHealthy || !gSensor.imuHealthy;
+        gSafety.obstacleStop = (gState.mode != MANUAL_MODE) && gSensor.obstacleDetected;
+
+        if (gSafety.signalTimeout || gSafety.sensorFault || gSafety.obstacleStop) {
+            gState.mode = SAFE_STOP_MODE;
+            gState.finalMotion = CMD_STOP;
+            gState.speedPercent = 0U;
+            gState.safetyStopActive = true;
+            gState.brakeActive = false;
+            UpdateMotorStateCache(CMD_STOP, 0U);
+        } else {
+            gState.safetyStopActive = false;
+        }
+
+        if (!previousOverride && gState.safetyStopActive) {
+            BuildSnapshot(&snapshot);
+        }
+        previousOverride = gState.safetyStopActive;
+
+        xSemaphoreGive(gStateMutex);
+
+        if (snapshot.lock == NULL && snapshot.car.safetyStopActive) {
+            DebugUART_PrintSafetyEvent(&snapshot);
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(kSafetyPeriodMs));
     }
 }
 
@@ -172,17 +263,18 @@ static void DebugTask(void *pvParameters)
     (void)pvParameters;
 
     for (;;) {
-        xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        DebugUART_PrintState(&gAppContext);
-        xSemaphoreGive(gAppContext.lock);
+        AppContext snapshot = {};
+
+        xSemaphoreTake(gStateMutex, portMAX_DELAY);
+        BuildSnapshot(&snapshot);
+        xSemaphoreGive(gStateMutex);
+
+        DebugUART_PrintState(&snapshot);
         vTaskDelay(pdMS_TO_TICKS(kDebugTaskPeriodMs));
     }
 }
 
-static void UpdateMotorStateCache(
-    MotorState &motorState,
-    MotionCommand motion,
-    uint8_t speedPercent)
+static void UpdateMotorStateCache(MotionCommand motion, uint8_t speedPercent)
 {
     if (speedPercent > 100U) {
         speedPercent = 100U;
@@ -190,31 +282,45 @@ static void UpdateMotorStateCache(
 
     switch (motion) {
         case CMD_FORWARD:
-            motorState.leftPwmPercent = (int16_t)speedPercent;
-            motorState.rightPwmPercent = (int16_t)speedPercent;
-            motorState.driverEnabled = (speedPercent > 0U);
+            gMotor.leftPwmPercent = (int16_t)speedPercent;
+            gMotor.rightPwmPercent = (int16_t)speedPercent;
+            gMotor.driverEnabled = (speedPercent > 0U);
             break;
         case CMD_REVERSE:
-            motorState.leftPwmPercent = -(int16_t)speedPercent;
-            motorState.rightPwmPercent = -(int16_t)speedPercent;
-            motorState.driverEnabled = (speedPercent > 0U);
+            gMotor.leftPwmPercent = -(int16_t)speedPercent;
+            gMotor.rightPwmPercent = -(int16_t)speedPercent;
+            gMotor.driverEnabled = (speedPercent > 0U);
             break;
         case CMD_LEFT:
-            motorState.leftPwmPercent = (int16_t)(speedPercent / 2U);
-            motorState.rightPwmPercent = (int16_t)speedPercent;
-            motorState.driverEnabled = (speedPercent > 0U);
+            gMotor.leftPwmPercent = (int16_t)(speedPercent / 2U);
+            gMotor.rightPwmPercent = (int16_t)speedPercent;
+            gMotor.driverEnabled = (speedPercent > 0U);
             break;
         case CMD_RIGHT:
-            motorState.leftPwmPercent = (int16_t)speedPercent;
-            motorState.rightPwmPercent = (int16_t)(speedPercent / 2U);
-            motorState.driverEnabled = (speedPercent > 0U);
+            gMotor.leftPwmPercent = (int16_t)speedPercent;
+            gMotor.rightPwmPercent = (int16_t)(speedPercent / 2U);
+            gMotor.driverEnabled = (speedPercent > 0U);
             break;
         case CMD_BRAKE:
         case CMD_STOP:
         default:
-            motorState.leftPwmPercent = 0;
-            motorState.rightPwmPercent = 0;
-            motorState.driverEnabled = false;
+            gMotor.leftPwmPercent = 0;
+            gMotor.rightPwmPercent = 0;
+            gMotor.driverEnabled = false;
             break;
     }
+}
+
+static void BuildSnapshot(AppContext *appContext)
+{
+    if (appContext == NULL) {
+        return;
+    }
+
+    appContext->wirelessCommand = gCmd;
+    appContext->sensor = gSensor;
+    appContext->car = gState;
+    appContext->motor = gMotor;
+    appContext->safety = gSafety;
+    appContext->lock = NULL;
 }

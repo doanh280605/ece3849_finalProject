@@ -33,12 +33,7 @@ int main(void)
     Motor_Init();
     Wireless_Init();
     Safety_Init();
-    SystemTasks_InitContext();
-
-    if (!SystemTasks_Create()) {
-        while (true) {
-        }
-    }
+    Tasks_Create();
 
     IntMasterEnable();
     vTaskStartScheduler();
