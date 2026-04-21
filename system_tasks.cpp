@@ -21,7 +21,8 @@ static WirelessCommand gCmd = {CMD_STOP, 0U, MANUAL_MODE, false, 0U, 0U};
 static SensorData gSensor = {100.0f, false, true, true, 0.0f};
 static CarState gState = {MANUAL_MODE, CMD_STOP, CMD_STOP, 0U, 0, false, false, false};
 static MotorState gMotor = {0, 0, false};
-static SafetyState gSafety = {true, false, false};
+static SafetyState gSafety = {true, false, false, 0U, 0U};
+static TickType_t gLastWirelessTick = 0U;
 
 static SemaphoreHandle_t gStateMutex = NULL;
 
@@ -137,6 +138,9 @@ static void InitializeSharedState(void)
     gSafety.signalTimeout = true;
     gSafety.obstacleStop = false;
     gSafety.sensorFault = false;
+    gSafety.lastWirelessTick = 0U;
+    gSafety.wirelessAgeMs = 0U;
+    gLastWirelessTick = 0U;
 }
 
 static void WirelessRxTask(void *pvParameters)
@@ -150,6 +154,10 @@ static void WirelessRxTask(void *pvParameters)
             xSemaphoreTake(gStateMutex, portMAX_DELAY);
             temp.sequenceNumber = gCmd.sequenceNumber + 1U;
             gCmd = temp;
+            gLastWirelessTick = xTaskGetTickCount();
+            gCmd.receivedTick = (uint32_t)gLastWirelessTick;
+            gSafety.lastWirelessTick = (uint32_t)gLastWirelessTick;
+            gSafety.wirelessAgeMs = 0U;
             gState.signalAlive = true;
             xSemaphoreGive(gStateMutex);
         }
@@ -221,11 +229,16 @@ static void SafetyMonitorTask(void *pvParameters)
 
         xSemaphoreTake(gStateMutex, portMAX_DELAY);
 
-        if (gCmd.receivedTick == 0U) {
+        if (gLastWirelessTick == 0U) {
             gSafety.signalTimeout = true;
+            gSafety.lastWirelessTick = 0U;
+            gSafety.wirelessAgeMs = kSignalTimeoutMs + kSafetyPeriodMs;
         } else {
-            const TickType_t commandAgeTicks = xTaskGetTickCount() - gCmd.receivedTick;
-            gSafety.signalTimeout = commandAgeTicks > pdMS_TO_TICKS(kSignalTimeoutMs);
+            const TickType_t currentTick = xTaskGetTickCount();
+            const TickType_t wirelessAgeTicks = currentTick - gLastWirelessTick;
+            gSafety.lastWirelessTick = (uint32_t)gLastWirelessTick;
+            gSafety.wirelessAgeMs = (uint32_t)((wirelessAgeTicks * 1000U) / configTICK_RATE_HZ);
+            gSafety.signalTimeout = wirelessAgeTicks > pdMS_TO_TICKS(kSignalTimeoutMs);
         }
 
         gState.signalAlive = !gSafety.signalTimeout;

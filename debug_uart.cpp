@@ -29,7 +29,7 @@ void DebugUART_PrintState(const AppContext *appContext)
     (void)snprintf(
         buffer,
         sizeof(buffer),
-        "CMD rx=%s spd=%u mode=%s dist=%.1f obs=%d final=%s motor(L=%d,R=%d,en=%d)",
+        "CMD rx=%s spd=%u mode=%s dist=%.1f obs=%d final=%s motor(L=%d,R=%d,en=%d) link(age=%lu,to=%d)",
         MotionCommandToString(appContext->wirelessCommand.motion),
         (unsigned int)appContext->wirelessCommand.speedPercent,
         DriveModeToString(appContext->car.mode),
@@ -38,7 +38,9 @@ void DebugUART_PrintState(const AppContext *appContext)
         MotionCommandToString(appContext->car.finalMotion),
         (int)appContext->motor.leftPwmPercent,
         (int)appContext->motor.rightPwmPercent,
-        appContext->motor.driverEnabled ? 1 : 0);
+        appContext->motor.driverEnabled ? 1 : 0,
+        (unsigned long)appContext->safety.wirelessAgeMs,
+        appContext->safety.signalTimeout ? 1 : 0);
     DebugUART_Print(buffer);
 }
 
@@ -53,10 +55,11 @@ void DebugUART_PrintSafetyEvent(const AppContext *appContext)
     (void)snprintf(
         buffer,
         sizeof(buffer),
-        "SAFETY override timeout=%d obstacle=%d sensorFault=%d final=%s",
+        "SAFETY override timeout=%d obstacle=%d sensorFault=%d age=%lums final=%s",
         appContext->safety.signalTimeout ? 1 : 0,
         appContext->safety.obstacleStop ? 1 : 0,
         appContext->safety.sensorFault ? 1 : 0,
+        (unsigned long)appContext->safety.wirelessAgeMs,
         MotionCommandToString(appContext->car.finalMotion));
     DebugUART_Print(buffer);
 }

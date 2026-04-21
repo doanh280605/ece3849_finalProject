@@ -62,6 +62,8 @@ struct SafetyState {
     bool signalTimeout;
     bool obstacleStop;
     bool sensorFault;
+    uint32_t lastWirelessTick;
+    uint32_t wirelessAgeMs;
 };
 
 struct AppContext {
