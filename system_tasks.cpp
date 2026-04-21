@@ -82,7 +82,13 @@ static void WirelessTask(void *pvParameters)
 
     for (;;) {
         xSemaphoreTake(gAppContext.lock, portMAX_DELAY);
-        Wireless_Poll(gAppContext.wirelessCommand, gAppContext.car);
+        if (Wireless_GetLatestCommand(&gAppContext.wirelessCommand)) {
+            gAppContext.wirelessCommand.sequenceNumber++;
+            gAppContext.car.signalAlive = true;
+        } else {
+            gAppContext.wirelessCommand.valid = false;
+            gAppContext.car.signalAlive = false;
+        }
         xSemaphoreGive(gAppContext.lock);
         vTaskDelay(pdMS_TO_TICKS(kWirelessTaskPeriodMs));
     }

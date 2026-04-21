@@ -1,6 +1,12 @@
-#pragma once
+#ifndef WIRELESS_H
+#define WIRELESS_H
+
+#include <stdbool.h>
 
 #include "app_types.h"
 
 void Wireless_Init(void);
-void Wireless_Poll(WirelessCommand &wirelessCommand, CarState &carState);
+bool Wireless_GetLatestCommand(WirelessCommand *cmd);
+void Wireless_MockInput(WirelessCommand *cmd);
+
+#endif
