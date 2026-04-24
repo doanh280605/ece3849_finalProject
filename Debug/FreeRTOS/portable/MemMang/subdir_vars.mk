@@ -4,7 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/MemMang/heap_4.c 
+/Users/Doanh/Documents/ECE_3849/final_project/FreeRTOS/portable/MemMang/heap_4.c 
 
 C_DEPS += \
 ./FreeRTOS/portable/MemMang/heap_4.d 
@@ -19,6 +19,6 @@ C_DEPS__QUOTED += \
 "FreeRTOS/portable/MemMang/heap_4.d" 
 
 C_SRCS__QUOTED += \
-"/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/MemMang/heap_4.c" 
+"/Users/Doanh/Documents/ECE_3849/final_project/FreeRTOS/portable/MemMang/heap_4.c" 
 
 

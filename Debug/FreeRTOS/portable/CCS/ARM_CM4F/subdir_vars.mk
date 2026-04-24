@@ -4,10 +4,10 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 ASM_SRCS += \
-/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F/portasm.asm 
+/Users/Doanh/Documents/ECE_3849/final_project/FreeRTOS/portable/CCS/ARM_CM4F/portasm.asm 
 
 C_SRCS += \
-/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F/port.c 
+/Users/Doanh/Documents/ECE_3849/final_project/FreeRTOS/portable/CCS/ARM_CM4F/port.c 
 
 C_DEPS += \
 ./FreeRTOS/portable/CCS/ARM_CM4F/port.d 
@@ -30,9 +30,9 @@ ASM_DEPS__QUOTED += \
 "FreeRTOS/portable/CCS/ARM_CM4F/portasm.d" 
 
 C_SRCS__QUOTED += \
-"/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F/port.c" 
+"/Users/Doanh/Documents/ECE_3849/final_project/FreeRTOS/portable/CCS/ARM_CM4F/port.c" 
 
 ASM_SRCS__QUOTED += \
-"/Users/Doanh/Documents/ECE_3849/lab1/FreeRTOS/portable/CCS/ARM_CM4F/portasm.asm" 
+"/Users/Doanh/Documents/ECE_3849/final_project/FreeRTOS/portable/CCS/ARM_CM4F/portasm.asm" 
 
 

@@ -7,7 +7,15 @@ void Sensor_Init(void)
 
 void Sensor_Read(SensorData *data)
 {
-    Sensor_MockRead(data);
+    if (data == NULL) {
+        return;
+    }
+
+    data->distanceCm = 100.0f;
+    data->obstacleDetected = false;
+    data->ultrasonicHealthy = true;
+    data->imuHealthy = true;
+    data->yawRateDps = 0.0f;
 }
 
 void Sensor_MockRead(SensorData *data)

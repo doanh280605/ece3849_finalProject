@@ -4,7 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-/Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver/button.cpp \
+/Users/Doanh/Documents/ECE_3849/final_project/libraries/buttonsDriver/button.cpp \
 ../controller_logic.cpp \
 ../debug_uart.cpp \
 ../main.cpp \
@@ -12,15 +12,15 @@ CPP_SRCS += \
 ../safety.cpp \
 ../sensor.cpp \
 ../system_tasks.cpp \
-../wireless.cpp \
-/Users/Doanh/Documents/ECE_3849/lab1/libraries/timerLib/timerLib.cpp 
+/Users/Doanh/Documents/ECE_3849/final_project/libraries/timerLib/timerLib.cpp \
+../wireless.cpp 
 
 CMD_SRCS += \
 ../tm4c1294ncpdt.cmd 
 
 C_SRCS += \
-/Users/Doanh/Documents/ECE_3849/lab1/libraries/display/Crystalfontz128x128_ST7735.c \
-/Users/Doanh/Documents/ECE_3849/lab1/libraries/display/HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.c \
+/Users/Doanh/Documents/ECE_3849/final_project/libraries/display/Crystalfontz128x128_ST7735.c \
+/Users/Doanh/Documents/ECE_3849/final_project/libraries/display/HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.c \
 ../startup_ccs.c 
 
 C_DEPS += \
@@ -40,8 +40,8 @@ OBJS += \
 ./sensor.obj \
 ./startup_ccs.obj \
 ./system_tasks.obj \
-./wireless.obj \
-./timerLib.obj 
+./timerLib.obj \
+./wireless.obj 
 
 CPP_DEPS += \
 ./button.d \
@@ -52,8 +52,8 @@ CPP_DEPS += \
 ./safety.d \
 ./sensor.d \
 ./system_tasks.d \
-./wireless.d \
-./timerLib.d 
+./timerLib.d \
+./wireless.d 
 
 OBJS__QUOTED += \
 "Crystalfontz128x128_ST7735.obj" \
@@ -67,8 +67,8 @@ OBJS__QUOTED += \
 "sensor.obj" \
 "startup_ccs.obj" \
 "system_tasks.obj" \
-"wireless.obj" \
-"timerLib.obj" 
+"timerLib.obj" \
+"wireless.obj" 
 
 C_DEPS__QUOTED += \
 "Crystalfontz128x128_ST7735.d" \
@@ -84,16 +84,16 @@ CPP_DEPS__QUOTED += \
 "safety.d" \
 "sensor.d" \
 "system_tasks.d" \
-"wireless.d" \
-"timerLib.d" 
+"timerLib.d" \
+"wireless.d" 
 
 C_SRCS__QUOTED += \
-"/Users/Doanh/Documents/ECE_3849/lab1/libraries/display/Crystalfontz128x128_ST7735.c" \
-"/Users/Doanh/Documents/ECE_3849/lab1/libraries/display/HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.c" \
+"/Users/Doanh/Documents/ECE_3849/final_project/libraries/display/Crystalfontz128x128_ST7735.c" \
+"/Users/Doanh/Documents/ECE_3849/final_project/libraries/display/HAL_EK_TM4C1294XL_Crystalfontz128x128_ST7735.c" \
 "../startup_ccs.c" 
 
 CPP_SRCS__QUOTED += \
-"/Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver/button.cpp" \
+"/Users/Doanh/Documents/ECE_3849/final_project/libraries/buttonsDriver/button.cpp" \
 "../controller_logic.cpp" \
 "../debug_uart.cpp" \
 "../main.cpp" \
@@ -101,6 +101,7 @@ CPP_SRCS__QUOTED += \
 "../safety.cpp" \
 "../sensor.cpp" \
 "../system_tasks.cpp" \
-"../wireless.cpp" \
-"/Users/Doanh/Documents/ECE_3849/lab1/libraries/timerLib/timerLib.cpp" 
+"/Users/Doanh/Documents/ECE_3849/final_project/libraries/timerLib/timerLib.cpp" \
+"../wireless.cpp" 
+
 

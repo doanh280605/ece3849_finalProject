@@ -19,8 +19,8 @@ ORDERED_OBJS += \
 "./sensor.obj" \
 "./startup_ccs.obj" \
 "./system_tasks.obj" \
-"./wireless.obj" \
 "./timerLib.obj" \
+"./wireless.obj" \
 "./FreeRTOS/croutine.obj" \
 "./FreeRTOS/event_groups.obj" \
 "./FreeRTOS/list.obj" \
@@ -180,3 +180,4 @@ clean:
 .SECONDARY:
 
 -include ../makefile.targets
+

@@ -7,6 +7,5 @@
 
 void Wireless_Init(void);
 bool Wireless_GetLatestCommand(WirelessCommand *cmd);
-void Wireless_MockInput(WirelessCommand *cmd);
 
 #endif
