@@ -4,10 +4,10 @@
 #include "app_types.h"
 #include "controller_logic.h"
 #include "debug_uart.h"
+#include "joystick.h"
 #include "motor.h"
 #include "safety.h"
 #include "sensor.h"
-#include "wireless.h"
 
 extern "C" {
 #include "FreeRTOS.h"
@@ -26,7 +26,7 @@ static TickType_t gLastWirelessTick = 0U;
 
 static SemaphoreHandle_t gStateMutex = NULL;
 
-static void WirelessRxTask(void *pvParameters);
+static void JoystickControlTask(void *pvParameters);
 static void SensorTask(void *pvParameters);
 static void ControlTask(void *pvParameters);
 static void MotorTask(void *pvParameters);
@@ -34,13 +34,14 @@ static void SafetyMonitorTask(void *pvParameters);
 static void DebugTask(void *pvParameters);
 
 static void InitializeSharedState(void);
+static WirelessCommand BuildJoystickCommand(Joystick &joystick);
 static void UpdateMotorStateCache(MotionCommand motion, uint8_t speedPercent);
 static void BuildSnapshot(AppContext *appContext);
 
-static const uint32_t kWirelessPeriodMs = 20U;
+static const uint32_t kJoystickPeriodMs = 10U;
 static const uint32_t kSensorPeriodMs = 50U;
 static const uint32_t kControlPeriodMs = 20U;
-static const uint32_t kMotorPeriodMs = 20U;
+static const uint32_t kMotorPeriodMs = 1U;
 static const uint32_t kSafetyPeriodMs = 100U;
 static const uint32_t kSignalTimeoutMs = 250U;
 
@@ -58,8 +59,8 @@ void Tasks_Create(void)
     }
 
     status &= xTaskCreate(
-        WirelessRxTask,
-        "WirelessRx",
+        JoystickControlTask,
+        "Joystick",
         kDefaultTaskStackWords,
         NULL,
         kWirelessTaskPriority,
@@ -143,26 +144,34 @@ static void InitializeSharedState(void)
     gLastWirelessTick = 0U;
 }
 
-static void WirelessRxTask(void *pvParameters)
+static void JoystickControlTask(void *pvParameters)
 {
     (void)pvParameters;
 
+    Joystick joystick(JSX, JSY, JS1);
+    joystick.setTickIntervalMs(kJoystickPeriodMs);
+    joystick.setDeadzone(0.12f);
+    joystick.setSmoothingAlpha(0.25f);
+    joystick.setDirectionThreshold(0.25f);
+    joystick.setDirectionHysteresis(0.18f, 15.0f);
+    joystick.begin();
+    joystick.calibrateCenter(32U);
+
     for (;;) {
-        WirelessCommand temp = {};
+        joystick.tick();
+        WirelessCommand temp = BuildJoystickCommand(joystick);
 
-        if (Wireless_GetLatestCommand(&temp)) {
-            xSemaphoreTake(gStateMutex, portMAX_DELAY);
-            temp.sequenceNumber = gCmd.sequenceNumber + 1U;
-            gCmd = temp;
-            gLastWirelessTick = xTaskGetTickCount();
-            gCmd.receivedTick = (uint32_t)gLastWirelessTick;
-            gSafety.lastWirelessTick = (uint32_t)gLastWirelessTick;
-            gSafety.wirelessAgeMs = 0U;
-            gState.signalAlive = true;
-            xSemaphoreGive(gStateMutex);
-        }
+        xSemaphoreTake(gStateMutex, portMAX_DELAY);
+        temp.sequenceNumber = gCmd.sequenceNumber + 1U;
+        gCmd = temp;
+        gLastWirelessTick = xTaskGetTickCount();
+        gCmd.receivedTick = (uint32_t)gLastWirelessTick;
+        gSafety.lastWirelessTick = (uint32_t)gLastWirelessTick;
+        gSafety.wirelessAgeMs = 0U;
+        gState.signalAlive = true;
+        xSemaphoreGive(gStateMutex);
 
-        vTaskDelay(pdMS_TO_TICKS(kWirelessPeriodMs));
+        vTaskDelay(pdMS_TO_TICKS(kJoystickPeriodMs));
     }
 }
 
@@ -209,7 +218,7 @@ static void MotorTask(void *pvParameters)
         UpdateMotorStateCache(motion, speedPercent);
         xSemaphoreGive(gStateMutex);
 
-        if (motion == CMD_STOP || motion == CMD_BRAKE) {
+        if (motion == CMD_STOP) {
             Motor_Stop();
         } else {
             Motor_SetCommand(motion, speedPercent);
@@ -298,6 +307,35 @@ static void DebugTask(void *pvParameters)
         DebugUART_PrintState(&snapshot);
         vTaskDelay(pdMS_TO_TICKS(kDebugTaskPeriodMs));
     }
+}
+
+static WirelessCommand BuildJoystickCommand(Joystick &joystick)
+{
+    WirelessCommand command = {};
+    const float y = joystick.y();
+    const float verticalMagnitude = (y >= 0.0f) ? y : -y;
+    float movementMagnitude = joystick.magnitude();
+
+    if (movementMagnitude > 1.0f) {
+        movementMagnitude = 1.0f;
+    }
+
+    command.motion = CMD_STOP;
+    command.speedPercent = 0U;
+    command.mode = MANUAL_MODE;
+    command.valid = true;
+
+    if (verticalMagnitude < 0.20f) {
+        return command;
+    }
+
+    command.motion = (y > 0.0f) ? CMD_FORWARD : CMD_REVERSE;
+    command.speedPercent = (uint8_t)((movementMagnitude * 100.0f) + 0.5f);
+    if (command.speedPercent > 100U) {
+        command.speedPercent = 100U;
+    }
+
+    return command;
 }
 
 static void UpdateMotorStateCache(MotionCommand motion, uint8_t speedPercent)

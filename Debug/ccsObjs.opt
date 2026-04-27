@@ -3,6 +3,7 @@
 "./button.obj"
 "./controller_logic.obj"
 "./debug_uart.obj"
+"./joystick.obj"
 "./main.obj"
 "./motor.obj"
 "./safety.obj"

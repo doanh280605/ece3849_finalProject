@@ -13,7 +13,6 @@ extern "C" {
 #include "motor.h"
 #include "sensor.h"
 #include "system_tasks.h"
-#include "wireless.h"
 
 int main(void)
 {
@@ -27,7 +26,6 @@ int main(void)
 
     DebugUART_Init();
     Motor_Init();
-    Wireless_Init();
     Sensor_Init();
 
     Tasks_Create();

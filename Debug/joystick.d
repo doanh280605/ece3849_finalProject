@@ -1,7 +1,7 @@
 # FIXED
 
-joystick.obj: ../joystick.cpp
-joystick.obj: ../joystick.h
+joystick.obj: /Users/Doanh/Documents/ECE_3849/final_project/libraries/joystickDriver/joystick.cpp
+joystick.obj: /Users/Doanh/Documents/ECE_3849/final_project/libraries/joystickDriver/joystick.h
 joystick.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stdint.h
 joystick.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__config
 joystick.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/__config_site
@@ -34,13 +34,13 @@ joystick.obj: /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/
 joystick.obj: /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib/adc.h
 joystick.obj: /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib/sysctl.h
 joystick.obj: /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib/gpio.h
-joystick.obj: /Users/Doanh/Documents/ECE_3849/lab1/libraries/HAL_TM4C1294/pins.h
+joystick.obj: /Users/Doanh/Documents/ECE_3849/final_project/libraries/HAL_TM4C1294/pins.h
 joystick.obj: /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h
-joystick.obj: /Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver/button.h
+joystick.obj: /Users/Doanh/Documents/ECE_3849/final_project/libraries/buttonsDriver/button.h
 
-../joystick.cpp:
+/Users/Doanh/Documents/ECE_3849/final_project/libraries/joystickDriver/joystick.cpp:
 
-../joystick.h:
+/Users/Doanh/Documents/ECE_3849/final_project/libraries/joystickDriver/joystick.h:
 
 /Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/libcxx/stdint.h:
 
@@ -106,9 +106,9 @@ joystick.obj: /Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver/butto
 
 /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib/gpio.h:
 
-/Users/Doanh/Documents/ECE_3849/lab1/libraries/HAL_TM4C1294/pins.h:
+/Users/Doanh/Documents/ECE_3849/final_project/libraries/HAL_TM4C1294/pins.h:
 
 /Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h:
 
-/Users/Doanh/Documents/ECE_3849/lab1/libraries/buttonsDriver/button.h:
+/Users/Doanh/Documents/ECE_3849/final_project/libraries/buttonsDriver/button.h:
 

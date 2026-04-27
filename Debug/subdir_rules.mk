@@ -38,6 +38,13 @@ debug_uart.obj: /Users/Doanh/Documents/ECE_3849/final_project/ece3849_finalProje
 	@echo 'Finished building: "$<"'
 	@echo ' '
 
+joystick.obj: /Users/Doanh/Documents/ECE_3849/final_project/libraries/joystickDriver/joystick.cpp $(GEN_OPTS) | $(GEN_FILES) $(GEN_MISC_FILES)
+	@echo 'Building file: "$<"'
+	@echo 'Invoking: Arm Compiler'
+	"/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="/Users/Doanh/Documents/ECE_3849/final_project/ece3849_finalProject_lphung_shtran" --include_path="/Applications/ti/ccs1281/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --include_path="/Users/Doanh/Documents/ECE_3849/final_project/libraries/buttonsDriver" --include_path="/Users/Doanh/Documents/ECE_3849/final_project/libraries/display" --include_path="/Users/Doanh/Documents/ECE_3849/final_project/libraries/elapsedTime" --include_path="/Users/Doanh/Documents/ECE_3849/final_project/libraries/joystickDriver" --include_path="/Users/Doanh/Documents/ECE_3849/final_project/libraries/pll" --include_path="/Users/Doanh/Documents/ECE_3849/final_project/libraries/timerLib" --include_path="/Users/Doanh/Documents/ECE_3849/final_project/libraries/HAL_TM4C1294" --include_path="/Users/Doanh/ti/TivaWare_C_Series-2.2.0.295" --include_path="/Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/driverlib" --include_path="/Users/Doanh/ti/TivaWare_C_Series-2.2.0.295/utils" --include_path="/Users/Doanh/Documents/ECE_3849/final_project/FreeRTOS/include" --include_path="/Users/Doanh/Documents/ECE_3849/final_project/FreeRTOS/portable/CCS/ARM_CM4F" --include_path="PROJECT_LOC" --define=ccs="ccs" --define=PART_TM4C1294NCPDT -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="$(basename $(<F)).d_raw" $(GEN_OPTS__FLAG) "$<"
+	@echo 'Finished building: "$<"'
+	@echo ' '
+
 %.obj: ../%.cpp $(GEN_OPTS) | $(GEN_FILES) $(GEN_MISC_FILES)
 	@echo 'Building file: "$<"'
 	@echo 'Invoking: Arm Compiler'

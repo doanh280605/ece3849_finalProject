@@ -6,17 +6,18 @@
 
 Use this first for one motor channel before PWM is added:
 
-- `AIN1` -> `PN0`
-- `AIN2` -> `PN1`
-- `PWMA` -> `PN2` as a GPIO output, not PWM yet
-- `STBY` -> `3.3V` for the first test, or the driver will stay disabled
+- `AIN1` -> `PL0`
+- `AIN2` -> `PL1`
+- `PWMA` -> `PL2` as a GPIO output, not PWM yet
+- `STBY` -> `3.3V`, or the TB6612 will stay disabled
 - TM4C `GND` must connect to TB6612FNG `GND`
 
 With the current code:
 
 - joystick up / `U` / `F` sets `AIN1 = 1`, `AIN2 = 0`, `PWMA = 1`
-- joystick down / `D` / `R` sets `AIN1 = 0`, `AIN2 = 1`, `PWMA = 1`
-- stop / `S` sets `AIN1 = 0`, `AIN2 = 0`, `PWMA = 0`
+- joystick down / `D` / `B` sets `AIN1 = 0`, `AIN2 = 1`, `PWMA = 1`
+- joystick right / `R` and joystick left / `L` stop the single motor until a second motor is added
+- stop / `S` / `0` / `C` / `N` sets `AIN1 = 0`, `AIN2 = 0`, `PWMA = 0`
 
 Keep the wheels off the table for the first run.
 
@@ -58,8 +59,10 @@ Keep the wheels off the table for the first run.
   - update `WirelessCommand`
 - Current joystick command bytes:
   - `U` or `F` = forward
-  - `D` or `R` = reverse
-  - `S` or `0` = stop
+  - `D` or `B` = reverse
+  - `L` = left, stops the one-motor bring-up
+  - `R` or `X` = right, stops the one-motor bring-up
+  - `S`, `0`, `C`, or `N` = stop
 - Current packet examples:
   - `<U,80,0>` = joystick up / forward at 80%
   - `<D,80,0>` = joystick down / reverse at 80%

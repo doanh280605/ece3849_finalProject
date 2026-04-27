@@ -126,6 +126,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/libraries/buttonsDriver/button.cpp</locationURI>
 		</link>
 		<link>
+			<name>joystick.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/libraries/joystickDriver/joystick.cpp</locationURI>
+		</link>
+		<link>
 			<name>timerLib.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/libraries/timerLib/timerLib.cpp</locationURI>

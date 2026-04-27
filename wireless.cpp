@@ -51,17 +51,25 @@ bool Wireless_GetLatestCommand(WirelessCommand *cmd)
         return false;
     }
 
+    bool receivedCommand = false;
+    WirelessCommand latest = {};
+
     while (UARTCharsAvail(UART0_BASE)) {
         const char byte = (char)UARTCharGetNonBlocking(UART0_BASE);
 
         if (ParsePacketByte(byte, cmd) ||
             (!gPacketInProgress && ParseJoystickByte(byte, cmd))) {
-            cmd->receivedTick = xTaskGetTickCount();
-            return true;
+            latest = *cmd;
+            receivedCommand = true;
         }
     }
 
-    return false;
+    if (receivedCommand) {
+        *cmd = latest;
+        cmd->receivedTick = xTaskGetTickCount();
+    }
+
+    return receivedCommand;
 }
 
 static bool ParseJoystickByte(char byte, WirelessCommand *cmd)
@@ -80,14 +88,14 @@ static bool ParseJoystickByte(char byte, WirelessCommand *cmd)
         case 'd':
         case 'B':
         case 'b':
-        case 'R':
-        case 'r':
             cmd->motion = CMD_REVERSE;
             break;
         case 'L':
         case 'l':
             cmd->motion = CMD_LEFT;
             break;
+        case 'R':
+        case 'r':
         case 'X':
         case 'x':
             cmd->motion = CMD_RIGHT;
@@ -95,6 +103,10 @@ static bool ParseJoystickByte(char byte, WirelessCommand *cmd)
         case 'S':
         case 's':
         case '0':
+        case 'C':
+        case 'c':
+        case 'N':
+        case 'n':
             cmd->motion = CMD_STOP;
             cmd->speedPercent = 0U;
             break;
@@ -189,18 +201,22 @@ static MotionCommand ParseMotion(char motionByte, bool *ok)
         case 'd':
         case 'B':
         case 'b':
-        case 'R':
-        case 'r':
             return CMD_REVERSE;
         case 'L':
         case 'l':
             return CMD_LEFT;
+        case 'R':
+        case 'r':
         case 'X':
         case 'x':
             return CMD_RIGHT;
         case 'S':
         case 's':
         case '0':
+        case 'C':
+        case 'c':
+        case 'N':
+        case 'n':
             return CMD_STOP;
         default:
             *ok = false;

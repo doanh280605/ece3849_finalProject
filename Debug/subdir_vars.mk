@@ -7,6 +7,7 @@ CPP_SRCS += \
 /Users/Doanh/Documents/ECE_3849/final_project/libraries/buttonsDriver/button.cpp \
 ../controller_logic.cpp \
 ../debug_uart.cpp \
+/Users/Doanh/Documents/ECE_3849/final_project/libraries/joystickDriver/joystick.cpp \
 ../main.cpp \
 ../motor.cpp \
 ../safety.cpp \
@@ -34,6 +35,7 @@ OBJS += \
 ./button.obj \
 ./controller_logic.obj \
 ./debug_uart.obj \
+./joystick.obj \
 ./main.obj \
 ./motor.obj \
 ./safety.obj \
@@ -47,6 +49,7 @@ CPP_DEPS += \
 ./button.d \
 ./controller_logic.d \
 ./debug_uart.d \
+./joystick.d \
 ./main.d \
 ./motor.d \
 ./safety.d \
@@ -61,6 +64,7 @@ OBJS__QUOTED += \
 "button.obj" \
 "controller_logic.obj" \
 "debug_uart.obj" \
+"joystick.obj" \
 "main.obj" \
 "motor.obj" \
 "safety.obj" \
@@ -79,6 +83,7 @@ CPP_DEPS__QUOTED += \
 "button.d" \
 "controller_logic.d" \
 "debug_uart.d" \
+"joystick.d" \
 "main.d" \
 "motor.d" \
 "safety.d" \
@@ -96,6 +101,7 @@ CPP_SRCS__QUOTED += \
 "/Users/Doanh/Documents/ECE_3849/final_project/libraries/buttonsDriver/button.cpp" \
 "../controller_logic.cpp" \
 "../debug_uart.cpp" \
+"/Users/Doanh/Documents/ECE_3849/final_project/libraries/joystickDriver/joystick.cpp" \
 "../main.cpp" \
 "../motor.cpp" \
 "../safety.cpp" \
