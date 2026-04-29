@@ -13,6 +13,9 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
+
+#include "Crystalfontz128x128_ST7735.h"
+#include "grlib/grlib.h"
 }
 
 uint32_t gSystemClockHz = 0U;
@@ -35,6 +38,9 @@ static void DebugTask(void *pvParameters);
 
 static void InitializeSharedState(void);
 static WirelessCommand BuildJoystickCommand(Joystick &joystick);
+static void Display_Init(void);
+static void Display_ShowDirection(MotionCommand motion);
+static const char *Display_DirectionText(MotionCommand motion);
 static void UpdateMotorStateCache(MotionCommand motion, uint8_t speedPercent);
 static void BuildSnapshot(AppContext *appContext);
 
@@ -44,6 +50,8 @@ static const uint32_t kControlPeriodMs = 20U;
 static const uint32_t kMotorPeriodMs = 1U;
 static const uint32_t kSafetyPeriodMs = 100U;
 static const uint32_t kSignalTimeoutMs = 250U;
+
+static tContext gDisplayContext;
 
 void Tasks_Create(void)
 {
@@ -57,6 +65,8 @@ void Tasks_Create(void)
         while (1) {
         }
     }
+
+    Display_Init();
 
     status &= xTaskCreate(
         JoystickControlTask,
@@ -156,10 +166,17 @@ static void JoystickControlTask(void *pvParameters)
     joystick.setDirectionHysteresis(0.18f, 15.0f);
     joystick.begin();
     joystick.calibrateCenter(32U);
+    Display_ShowDirection(CMD_STOP);
 
     for (;;) {
+        static MotionCommand lastDisplayedMotion = CMD_STOP;
         joystick.tick();
         WirelessCommand temp = BuildJoystickCommand(joystick);
+
+        if (temp.motion != lastDisplayedMotion) {
+            Display_ShowDirection(temp.motion);
+            lastDisplayedMotion = temp.motion;
+        }
 
         xSemaphoreTake(gStateMutex, portMAX_DELAY);
         temp.sequenceNumber = gCmd.sequenceNumber + 1U;
@@ -312,7 +329,9 @@ static void DebugTask(void *pvParameters)
 static WirelessCommand BuildJoystickCommand(Joystick &joystick)
 {
     WirelessCommand command = {};
+    const float x = joystick.x();
     const float y = joystick.y();
+    const float horizontalMagnitude = (x >= 0.0f) ? x : -x;
     const float verticalMagnitude = (y >= 0.0f) ? y : -y;
     float movementMagnitude = joystick.magnitude();
 
@@ -325,17 +344,71 @@ static WirelessCommand BuildJoystickCommand(Joystick &joystick)
     command.mode = MANUAL_MODE;
     command.valid = true;
 
-    if (verticalMagnitude < 0.20f) {
+    if (movementMagnitude < 0.20f) {
         return command;
     }
 
-    command.motion = (y > 0.0f) ? CMD_FORWARD : CMD_REVERSE;
+    if (verticalMagnitude >= horizontalMagnitude) {
+        command.motion = (y > 0.0f) ? CMD_FORWARD : CMD_REVERSE;
+    } else {
+        command.motion = (x > 0.0f) ? CMD_RIGHT : CMD_LEFT;
+    }
+
     command.speedPercent = (uint8_t)((movementMagnitude * 100.0f) + 0.5f);
     if (command.speedPercent > 100U) {
         command.speedPercent = 100U;
     }
 
     return command;
+}
+
+static void Display_Init(void)
+{
+    Crystalfontz128x128_Init();
+    Crystalfontz128x128_SetOrientation(LCD_ORIENTATION_UP);
+
+    GrContextInit(&gDisplayContext, &g_sCrystalfontz128x128);
+    GrContextFontSet(&gDisplayContext, g_psFontCm20);
+    GrContextForegroundSet(&gDisplayContext, ClrWhite);
+    GrContextBackgroundSet(&gDisplayContext, ClrBlack);
+
+    const tRectangle screen = {0, 0, 127, 127};
+    GrRectFill(&gDisplayContext, &screen);
+    GrFlush(&gDisplayContext);
+}
+
+static void Display_ShowDirection(MotionCommand motion)
+{
+    const tRectangle screen = {0, 0, 127, 127};
+    GrContextForegroundSet(&gDisplayContext, ClrBlack);
+    GrRectFill(&gDisplayContext, &screen);
+
+    GrContextForegroundSet(&gDisplayContext, ClrWhite);
+    GrStringDrawCentered(
+        &gDisplayContext,
+        Display_DirectionText(motion),
+        -1,
+        64,
+        64,
+        false);
+    GrFlush(&gDisplayContext);
+}
+
+static const char *Display_DirectionText(MotionCommand motion)
+{
+    switch (motion) {
+        case CMD_FORWARD:
+            return "Up";
+        case CMD_REVERSE:
+            return "Down";
+        case CMD_LEFT:
+            return "Left";
+        case CMD_RIGHT:
+            return "Right";
+        case CMD_STOP:
+        default:
+            return "Center";
+    }
 }
 
 static void UpdateMotorStateCache(MotionCommand motion, uint8_t speedPercent)
@@ -356,13 +429,13 @@ static void UpdateMotorStateCache(MotionCommand motion, uint8_t speedPercent)
             gMotor.driverEnabled = (speedPercent > 0U);
             break;
         case CMD_LEFT:
-            gMotor.leftPwmPercent = (int16_t)(speedPercent / 2U);
+            gMotor.leftPwmPercent = 0;
             gMotor.rightPwmPercent = (int16_t)speedPercent;
             gMotor.driverEnabled = (speedPercent > 0U);
             break;
         case CMD_RIGHT:
             gMotor.leftPwmPercent = (int16_t)speedPercent;
-            gMotor.rightPwmPercent = (int16_t)(speedPercent / 2U);
+            gMotor.rightPwmPercent = 0;
             gMotor.driverEnabled = (speedPercent > 0U);
             break;
         case CMD_BRAKE:

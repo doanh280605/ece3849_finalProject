@@ -14,11 +14,16 @@ extern "C" {
 static const uint8_t kAin1Pin = GPIO_PIN_0;  // PL0 -> TB6612 AIN1
 static const uint8_t kAin2Pin = GPIO_PIN_1;  // PL1 -> TB6612 AIN2
 static const uint8_t kPwmaPin = GPIO_PIN_2;  // PL2 -> TB6612 PWMA software PWM
-static const uint8_t kMotorPins = kAin1Pin | kAin2Pin | kPwmaPin;
+static const uint8_t kMotorAPins = kAin1Pin | kAin2Pin | kPwmaPin;
+static const uint8_t kBin1Pin = GPIO_PIN_1;  // PF1 -> TB6612 BIN1
+static const uint8_t kBin2Pin = GPIO_PIN_2;  // PF2 -> TB6612 BIN2
+static const uint8_t kPwmbPin = GPIO_PIN_3;  // PF3 -> TB6612 PWMB software PWM
+static const uint8_t kMotorBPins = kBin1Pin | kBin2Pin | kPwmbPin;
 static const uint8_t kSoftwarePwmPeriodTicks = 20U;
 static const TickType_t kDirectionChangeStopDelayTicks = pdMS_TO_TICKS(100U);
 
-static int8_t gCurrentDirection = 0;
+static int8_t gCurrentLeftDirection = 0;
+static int8_t gCurrentRightDirection = 0;
 static uint8_t gPwmPhase = 0U;
 
 static void Motor_WriteA(bool ain1High, bool ain2High, bool pwmaHigh)
@@ -35,22 +40,73 @@ static void Motor_WriteA(bool ain1High, bool ain2High, bool pwmaHigh)
         value |= kPwmaPin;
     }
 
-    GPIOPinWrite(GPIO_PORTL_BASE, kMotorPins, value);
+    GPIOPinWrite(GPIO_PORTL_BASE, kMotorAPins, value);
+}
+
+static void Motor_WriteB(bool bin1High, bool bin2High, bool pwmbHigh)
+{
+    uint8_t value = 0U;
+
+    if (bin1High) {
+        value |= kBin1Pin;
+    }
+    if (bin2High) {
+        value |= kBin2Pin;
+    }
+    if (pwmbHigh) {
+        value |= kPwmbPin;
+    }
+
+    GPIOPinWrite(GPIO_PORTF_BASE, kMotorBPins, value);
+}
+
+static bool Motor_NeedsDirectionStop(int8_t currentDirection, int8_t requestedDirection)
+{
+    return (currentDirection != 0) &&
+           (requestedDirection != 0) &&
+           (currentDirection != requestedDirection);
+}
+
+static void Motor_WriteChannelA(int8_t direction, bool pwmHigh)
+{
+    if (direction > 0) {
+        Motor_WriteA(true, false, pwmHigh);
+    } else if (direction < 0) {
+        Motor_WriteA(false, true, pwmHigh);
+    } else {
+        Motor_WriteA(false, false, true);
+    }
+}
+
+static void Motor_WriteChannelB(int8_t direction, bool pwmHigh)
+{
+    if (direction > 0) {
+        Motor_WriteB(true, false, pwmHigh);
+    } else if (direction < 0) {
+        Motor_WriteB(false, true, pwmHigh);
+    } else {
+        Motor_WriteB(false, false, true);
+    }
 }
 
 void Motor_Init(void)
 {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOL);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOL)) {
     }
+    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF)) {
+    }
 
-    GPIOPinTypeGPIOOutput(GPIO_PORTL_BASE, kMotorPins);
+    GPIOPinTypeGPIOOutput(GPIO_PORTL_BASE, kMotorAPins);
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, kMotorBPins);
     Motor_Stop();
 }
 
 void Motor_SetCommand(MotionCommand cmd, uint8_t speedPercent)
 {
-    int8_t requestedDirection = 0;
+    int8_t requestedLeftDirection = 0;
+    int8_t requestedRightDirection = 0;
 
     if (speedPercent > 100U) {
         speedPercent = 100U;
@@ -63,19 +119,26 @@ void Motor_SetCommand(MotionCommand cmd, uint8_t speedPercent)
 
     switch (cmd) {
         case CMD_FORWARD:
-            requestedDirection = 1;
+            requestedLeftDirection = 1;
+            requestedRightDirection = 1;
             break;
         case CMD_REVERSE:
-            requestedDirection = -1;
+            requestedLeftDirection = -1;
+            requestedRightDirection = -1;
             break;
         case CMD_BRAKE:
             Motor_WriteA(true, true, true);
-            gCurrentDirection = 0;
+            Motor_WriteB(true, true, true);
+            gCurrentLeftDirection = 0;
+            gCurrentRightDirection = 0;
+            break;
+        case CMD_RIGHT:
+            requestedLeftDirection = 1;
+            requestedRightDirection = 0;
             break;
         case CMD_LEFT:
-        case CMD_RIGHT:
-            // One-motor bring-up: sideways joystick motion should not drive forward.
-            Motor_Stop();
+            requestedLeftDirection = 0;
+            requestedRightDirection = 1;
             break;
         case CMD_STOP:
         default:
@@ -83,16 +146,18 @@ void Motor_SetCommand(MotionCommand cmd, uint8_t speedPercent)
             break;
     }
 
-    if (requestedDirection == 0) {
+    if ((requestedLeftDirection == 0) && (requestedRightDirection == 0)) {
         return;
     }
 
-    if ((gCurrentDirection != 0) && (gCurrentDirection != requestedDirection)) {
+    if (Motor_NeedsDirectionStop(gCurrentLeftDirection, requestedLeftDirection) ||
+        Motor_NeedsDirectionStop(gCurrentRightDirection, requestedRightDirection)) {
         Motor_Stop();
         vTaskDelay(kDirectionChangeStopDelayTicks);
     }
 
-    gCurrentDirection = requestedDirection;
+    gCurrentLeftDirection = requestedLeftDirection;
+    gCurrentRightDirection = requestedRightDirection;
 
     gPwmPhase++;
     if (gPwmPhase >= kSoftwarePwmPeriodTicks) {
@@ -103,16 +168,15 @@ void Motor_SetCommand(MotionCommand cmd, uint8_t speedPercent)
         (uint8_t)((((uint16_t)speedPercent * kSoftwarePwmPeriodTicks) + 99U) / 100U);
     const bool pwmHigh = (gPwmPhase < highTicks);
 
-    if (requestedDirection > 0) {
-        Motor_WriteA(true, false, pwmHigh);
-    } else {
-        Motor_WriteA(false, true, pwmHigh);
-    }
+    Motor_WriteChannelA(requestedLeftDirection, pwmHigh);
+    Motor_WriteChannelB(requestedRightDirection, pwmHigh);
 }
 
 void Motor_Stop(void)
 {
-    gCurrentDirection = 0;
+    gCurrentLeftDirection = 0;
+    gCurrentRightDirection = 0;
     gPwmPhase = 0U;
     Motor_WriteA(false, false, true);
+    Motor_WriteB(false, false, true);
 }
